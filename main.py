@@ -3,5 +3,9 @@
 
 attrs = set(['title', 'body', 'date'])
 
-sites = set(['http://www.kyounoryouri.jp/'])
+site = 'http://www.kyounoryouri.jp/'
 
+sites = set([site])
+
+
+expr_map = {site}
