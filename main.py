@@ -28,8 +28,12 @@ exprs = set(["html/body/div[@id='container']/div[@id='main-row']/div[@id='main-c
 o_knowledge_base = set()
 
 
+def contains_difference(set_a, set_b):
+   return False
+
 def synthesize_deta_extractor(knowledge_base):
-  # old_knowledge_base
+    knowledge = set()
+
     return ""
 
 
