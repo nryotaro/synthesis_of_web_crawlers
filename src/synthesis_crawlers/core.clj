@@ -1,6 +1,9 @@
-(ns synthesis-crawlers.core)
+(ns synthesis-crawlers.core
+  (:require [clojure.spec :as s]
+            [clojure.data :refer [diff]]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+#_(s/def ::knowledge) 
+
+(defn diff-knowledge? 
+  [knowledge-a knowledge-b]
+  (diff knowledge-a knowledge-b))
