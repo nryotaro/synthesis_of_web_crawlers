@@ -25,8 +25,11 @@ exprs = set(["html/body/div[@id='container']/div[@id='main-row']/div[@id='main-c
 
 # $x("html/body/div[@id='container']/div[@id='main-row']/div[@id='main-col']/div[@class='top--main-beginners-recipe']")
 
-o_knowledge_base = set()
+class Knowledge:
 
+    def __init__(self):
+
+    
 
 def contains_difference(set_a, set_b):
    return False
