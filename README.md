@@ -1,6 +1,14 @@
-# synthesis_of_web_crawlers
+# synthesis-crawlers
 
-## Requirements
+A Clojure library designed to ... well, that part is up to you.
 
-    pip install requests
-    pip install lxml
+## Usage
+
+FIXME
+
+## License
+
+Copyright © 2017 FIXME
+
+Distributed under the Eclipse Public License either version 1.0 or (at
+your option) any later version.
