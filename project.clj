@@ -6,5 +6,5 @@
   :dependencies [[org.clojure/clojure "1.9.0-alpha15"]
                  [org.jsoup/jsoup "1.10.2"]
                  [http-kit "2.2.0"]]
-
-  :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.19.0"]]}})
+  :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.19.0"]]
+                   :resource-paths ["dev-resources"]}})
