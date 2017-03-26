@@ -27,6 +27,11 @@
 
 
 (deftest extract-instance-test
+  (testing "tries extracting values with expressions"
+    (is (= (extract (slurp "dev-resources/index.html") 
+                    {"html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title]" {:title "h2 > a" :date "time[class=published]"}}) 
+           {:title #{"Installing Atom packages on Windows behind a proxy"}
+            :date #{"August 14, 2016"}})))
   (testing "extrtacts knowledge"
     #_(is (= (extract-knowledge #{:title :price} 
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
