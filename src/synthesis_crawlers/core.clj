@@ -1,5 +1,6 @@
 (ns synthesis-crawlers.core
   (:require [clojure.spec :as s]
+            [org.httpkit.client :as http]
             [clojure.data :refer [diff]]))
 
 #_(s/def ::knowledge) 
@@ -19,3 +20,8 @@
 (defn crawled?
   [extractor crawled-set]
   (crawled-set extractor))
+
+(defn get-page
+  "gets the specified web page and return its body"
+  [url]
+  (:body @(http/get url)))

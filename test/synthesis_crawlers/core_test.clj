@@ -1,5 +1,6 @@
 (ns synthesis-crawlers.core-test
   (:require [clojure.test :refer :all]
+            [clojure.string :refer [starts-with?]]
             [synthesis-crawlers.core :refer :all]))
 
 
@@ -20,11 +21,17 @@
   (testing "returns something if the specified extractor is used"
     (is (crawled? {"site-url" ["container-expr" {:attr "partial-expr"}]} #{{"site-url" ["container-expr" {:attr "partial-expr"}]}}))))
 
+(deftest get-page-test
+  (testing "gets the specified web page and return its body"
+    (is (starts-with? (get-page "http://www.http-kit.org/") "<!DOC"))))
+
 #_(deftest extract-instance-test
   (testing "extrtacts knowledge"
     (is (= (extract-kowledge #{:title :price} 
                       #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
                       #{{"http://www.barnesandnoble.com/" [["container-expr" {:title "title-expr" :rice "price-expr"}]]}}
                         #{}) {:complete nil :knowledge nil :incomplete nil}))))
+
+
 
 
