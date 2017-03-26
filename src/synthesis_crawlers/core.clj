@@ -16,3 +16,6 @@
   [extractor-a extractor-b]
   (diff? extractor-a extractor-b))
 
+(defn crawled?
+  [extractor crawled-set]
+  (crawled-set extractor))
