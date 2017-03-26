@@ -27,6 +27,22 @@
   [url]
   (:body @(http/get url)))
 
+#_(s/def ::text string?)
+#_(s/def ::extractors (s/coll-of seq?))
+#_(s/fdef extract
+       :args (s/cat :text ::text ::extractors))
+
+(defn extract
+  [text extractors]
+  (let [root (Jsoup/parse text)
+        extracted-list (for [container-extractor (keys extractors)
+                             container (.select root container-extractor)]; container-extractor: container-expr
+                         ; coll: map entries[attr: expr]
+                         (reduce #(assoc %1 (first %2) (.text (.select container (second %2)))) {} (get extractors container-extractor)))]
+    (reduce #(assoc %1 (first %2) (if (set? (second %2)) (second %2) (set (list (second %2))))) 
+            {} 
+            (apply (partial merge-with #(set %&)) extracted-list))))
+
 #_(defn extract-knowledge
   [attrs pages extractors knowledge]
   (for [page pages]
