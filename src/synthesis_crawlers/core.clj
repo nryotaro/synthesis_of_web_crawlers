@@ -25,6 +25,11 @@
 (defn get-page
   "gets the specified web page and return its body"
   [url]
+  (:body @(http/get url)))
+
+#_(defn extract-knowledge
+  [attrs pages extractors knowledge]
+  (for [page pages]
+    (Jsoup/parse (get-page page))))
   #_(doseq [elem (.select (.get (Jsoup/connect url)) "#html")](println (.html elem) ))
   #_(println (.html (.select (.get (Jsoup/connect url)) "html > body > div[id=content]")))
-  (:body @(http/get url)))
