@@ -20,10 +20,11 @@
   (testing "returns something if the specified extractor is used"
     (is (crawled? {"site-url" ["container-expr" {:attr "partial-expr"}]} #{{"site-url" ["container-expr" {:attr "partial-expr"}]}}))))
 
-(deftest extract-instance-test
+#_(deftest extract-instance-test
   (testing "extrtacts knowledge"
     (is (= (extract-kowledge #{:title :price} 
                       #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
-                      #{{"site-url" [["container-expr" {:title "title-expr"}]
-                                     ["container-expr" {:title "title-expr"}]]}}
+                      #{{"http://www.barnesandnoble.com/" [["container-expr" {:title "title-expr" :rice "price-expr"}]]}}
                         #{}) {:complete nil :knowledge nil :incomplete nil}))))
+
+
