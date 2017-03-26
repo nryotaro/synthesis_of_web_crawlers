@@ -25,6 +25,8 @@
   (testing "gets the specified web page and return its body"
     (is (starts-with? (get-page "http://www.http-kit.org/") "<!DOC"))))
 
+(deftest getpage)
+
 #_(deftest extract-instance-test
   (testing "extrtacts knowledge"
     (is (= (extract-kowledge #{:title :price} 
