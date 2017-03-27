@@ -38,5 +38,6 @@
   (testing "extrtacts knowledge"
     (is (= (extract-instance #{:title :price} 
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
-                             #{["container-expr" {:title "title-expr" :rice "price-expr"}]}
-                             #{}) {:complete nil :knowledge nil :incomplete nil}))))
+                             #{["container-expr" {:title "title-expr" :price "price-expr"}]}
+                             #{}) 
+           {:complete nil :knowledge nil :incomplete nil}))))
