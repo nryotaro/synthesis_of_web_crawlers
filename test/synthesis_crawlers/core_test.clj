@@ -1,8 +1,11 @@
 (ns synthesis-crawlers.core-test
   (:require [clojure.test :refer :all]
+            [clojure.spec :as s]
+            [clojure.spec.test :as stest]
             [clojure.string :refer [starts-with?]]
             [synthesis-crawlers.core :refer :all]))
 
+(stest/instrument)
 
 (deftest knowledge-difference-test
   (testing "returns some if there is no difference between two knowlege otherwise returns nil"
@@ -25,13 +28,13 @@
     (testing "gets the specified web page and return its body"
       (is (starts-with? (get-page "http://www.http-kit.org/") "<!DOC"))))
 
-
 (deftest extract-instance-test
   (testing "tries extracting values with expressions"
     (is (= (extract (slurp "dev-resources/index.html") 
                     {"html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title]" {:title "h2 > a" :date "time[class=published]"}}) 
            {:title #{"Installing Atom packages on Windows behind a proxy"}
             :date #{"August 14, 2016"}})))
+
   (testing "extrtacts knowledge"
     #_(is (= (extract-knowledge #{:title :price} 
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
