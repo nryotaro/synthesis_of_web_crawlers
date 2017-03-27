@@ -36,11 +36,7 @@
             :date #{"August 14, 2016"}})))
 
   (testing "extrtacts knowledge"
-    #_(is (= (extract-knowledge #{:title :price} 
+    (is (= (extract-instance #{:title :price} 
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
                              #{["container-expr" {:title "title-expr" :rice "price-expr"}]}
-                        #{}) {:complete nil :knowledge nil :incomplete nil}))))
-
-
-
-
+                             #{}) {:complete nil :knowledge nil :incomplete nil}))))

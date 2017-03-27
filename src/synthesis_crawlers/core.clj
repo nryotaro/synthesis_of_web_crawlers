@@ -30,8 +30,8 @@
 (s/def ::attr-extractor (s/map-of keyword? string?))
 (s/def ::extractors (s/map-of ::container-extractor ::attr-extractor))
 (s/fdef extract
-  :args (s/cat :text ::text :extractors ::extractors)
-  :ret (s/map-of keyword? set?))
+        :args (s/cat :text ::text :extractors ::extractors)
+        :ret (s/map-of keyword? set?))
 (defn extract
   [text extractors]
   (let [root (Jsoup/parse text)
