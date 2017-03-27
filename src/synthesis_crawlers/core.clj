@@ -25,6 +25,10 @@
   [url]
   (:body @(http/get url)))
 
+
+(s/def ::data-extractor (s/map-of keyword? string?))
+(s/def ::container-extractor string?)
+
 (s/def ::text string?)
 (s/def ::extractors (s/coll-of seq?))
 (s/fdef extract
