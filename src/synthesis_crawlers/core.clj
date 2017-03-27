@@ -4,8 +4,6 @@
             [clojure.data :refer [diff]])
   (:import (org.jsoup Jsoup)))
 
-#_(s/def ::knowledge) 
-
 (defn- diff? [a b]
   (let [a-b-c (diff a b)]
     (or (first a-b-c) (second a-b-c))))
@@ -27,10 +25,10 @@
   [url]
   (:body @(http/get url)))
 
-#_(s/def ::text string?)
-#_(s/def ::extractors (s/coll-of seq?))
-#_(s/fdef extract
-       :args (s/cat :text ::text ::extractors))
+(s/def ::text string?)
+(s/def ::extractors (s/coll-of seq?))
+(s/fdef extract
+       :args (s/cat :text ::text :extractors ::extractors))
 
 (defn extract
   [text extractors]
