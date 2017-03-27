@@ -5,8 +5,7 @@
   (:import (org.jsoup Jsoup)))
 
 (defn- diff? [a b]
-  (let [a-b-c (diff a b)]
-    (or (first a-b-c) (second a-b-c))))
+  (let [a-b-c (diff a b)] (or (first a-b-c) (second a-b-c))))
 
 (defn diff-knowledge? 
   [knowledge-a knowledge-b]
@@ -47,9 +46,10 @@
             {} 
             (apply (partial merge-with #(set %&)) extracted-list))))
 
-#_(defn extract-knowledge
+;; todo filter nil filter
+(defn extract-knowledge
   [attrs pages extractors knowledge]
   (for [page pages]
     (Jsoup/parse (get-page page))))
-  #_(doseq [elem (.select (.get (Jsoup/connect url)) "#html")](println (.html elem) ))
-  #_(println (.html (.select (.get (Jsoup/connect url)) "html > body > div[id=content]")))
+(doseq [elem (.select (.get (Jsoup/connect url)) "#html")](println (.html elem) ))
+(println (.html (.select (.get (Jsoup/connect url)) "html > body > div[id=content]")))
