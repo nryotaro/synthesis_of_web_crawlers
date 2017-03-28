@@ -27,9 +27,7 @@
 
 (s/def ::attr-extractor (s/map-of keyword? string?))
 (s/def ::container-extractor string?)
-(s/def ::empty-container #(and (string? %) (= (count %) 0)))
-(s/def ::empty-attr-extractor (s/map-of keyword? nil?))
-;(s/def ::incomplete-attr-extractor (s/map-of keyword? ))
+(s/def ::complete-attr-extractor (s/map-of keyword? string?))
 (s/def ::text string?)
 (s/def ::extractors (s/map-of ::container-extractor ::attr-extractor))
 (s/fdef extract
