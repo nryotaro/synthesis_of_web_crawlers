@@ -40,6 +40,15 @@
     (is (= (drop-undef-attr-extractors {:title nil :date ""})
            {:date ""}))))
 
+(deftest empty-extractor?-test
+  (testing "returns a non nil value iff the specifiled extractor is empty")
+  (is (= (empty-extractor? {"" {:a ""}})
+         false))
+  (is (= (empty-extractor? {}) 
+         true))
+  (is (= (empty-extractor? {nil {:a nil}}) 
+         true)))
+
   #_(testing "extrtacts knowledge"
     (is (= (extract-instance #{:title :price} 
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
