@@ -28,7 +28,15 @@
     (testing "gets the specified web page and return its body"
       (is (starts-with? (get-page "http://www.http-kit.org/") "<!DOC"))))
 
-(deftest extract-instance-test
+(deftest build-selector-test
+  (testing "builds a selector"
+    (is (= (build-selector :a "html" "body")
+           {:a "html > body"}))
+    (is (= (build-selector :a "" "body")
+           {:a "body"}))))
+
+
+#_(deftest extract-instance-test
   (testing "tries extracting values with expressions"
     (let [text (slurp "dev-resources/index.html")]
       #_(is (= (extract text

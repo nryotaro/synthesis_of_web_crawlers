@@ -26,6 +26,12 @@
   (:body @(http/get url)))
 
 
+(defn build-selector [attribute container-expr attr-expr]
+  {attribute 
+   (cond
+     (empty? container-expr) attr-expr
+     :else (str container-expr " > " attr-expr))})
+
 (s/def ::attr-extractor (s/map-of keyword? string?))
 (s/def ::container-extractor string?)
 (s/def ::complete-attr-extractor (s/map-of keyword? string?))
