@@ -35,6 +35,10 @@
     (is (= (build-selector :a "" "body")
            {:a "body"}))))
 
+(deftest build-selectors-test
+  (testing "converts the specified extractors to the selector map"
+    (is (= (build-selectors {"html" {:a "body"}})
+           {:a "html > body"}))))
 
 #_(deftest extract-instance-test
   (testing "tries extracting values with expressions"

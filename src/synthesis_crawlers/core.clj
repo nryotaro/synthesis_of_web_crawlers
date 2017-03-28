@@ -32,6 +32,10 @@
      (empty? container-expr) attr-expr
      :else (str container-expr " > " attr-expr))})
 
+(defn build-selectors
+  [extractors]
+  nil)
+
 (s/def ::attr-extractor (s/map-of keyword? string?))
 (s/def ::container-extractor string?)
 (s/def ::complete-attr-extractor (s/map-of keyword? string?))
