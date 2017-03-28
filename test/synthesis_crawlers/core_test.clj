@@ -53,7 +53,7 @@
          false))
   (is (= (empty-extractor? {}) 
          true))
-  (is (= (empty-extractor? {nil {:a nil}}) 
+  (is (= (empty-extractor? {"" {:a nil}}) 
          true)))
 
   #_(testing "extrtacts knowledge"

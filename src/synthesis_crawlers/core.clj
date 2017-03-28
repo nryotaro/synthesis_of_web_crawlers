@@ -25,12 +25,12 @@
   (:body @(http/get url)))
 
 
-(s/def ::data-extractor (s/map-of keyword? string?))
-(s/def ::container-extractor string?)
-
-(s/def ::text string?)
-(s/def ::container-extractor string?)
 (s/def ::attr-extractor (s/map-of keyword? string?))
+(s/def ::container-extractor string?)
+(s/def ::empty-container #(and (string? %) (= (count %) 0)))
+(s/def ::empty-attr-extractor (s/map-of keyword? nil?))
+;(s/def ::incomplete-attr-extractor (s/map-of keyword? ))
+(s/def ::text string?)
 (s/def ::extractors (s/map-of ::container-extractor ::attr-extractor))
 (s/fdef extract
         :args (s/cat :text ::text :extractors ::extractors)
@@ -57,8 +57,9 @@
   (select-keys attr-extractors (filter #(get attr-extractors %)  (keys attr-extractors))))
 
 (s/fdef empty-extractor?
-        :args (s/cat :extractor (s/map-of (s/or :contains ::container-extractor :empty nil?) 
+        :args (s/cat :extractor (s/map-of ::container-extractor 
                                           (s/map-of keyword? #(or (string? %) (nil? %))))))
+
 (s/def ::empty-extractor (s/map-of nil? (s/map-of keyword? nil?)))
 (defn empty-extractor?
   [extractor]
