@@ -30,10 +30,17 @@
 
 (deftest extract-instance-test
   (testing "tries extracting values with expressions"
-    (is (= (extract (slurp "dev-resources/index.html") 
-                    {"html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title]" {:title "h2 > a" :date "time[class=published]"}}) 
-           {:title #{"Installing Atom packages on Windows behind a proxy"}
-            :date #{"August 14, 2016"}})))
+    (let [text (slurp "dev-resources/index.html")]
+      (is (= (extract text
+                      {"html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title]" {:title "h2 > a" :date "time[class=published]"}}) 
+             {:title #{"Installing Atom packages on Windows behind a proxy"}
+              :date #{"August 14, 2016"}}))
+      (is (= (extract text
+                      {"" {:title "html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title] > h2 > a" 
+                           :date "html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title] > time[class=published]"}}) 
+             {:title #{"Installing Atom packages on Windows behind a proxy"}
+              :date #{"August 14, 2016"}})))))
+
 
 (deftest filter-undefined-extractor-test
   (testing "drops the undefined expressions of attributes"
@@ -54,4 +61,4 @@
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
                              #{["container-expr" {:title "title-expr" :price "price-expr"}]}
                              #{}) 
-           {:complete nil :knowledge nil :incomplete nil}))))
+           {:complete nil :knowledge nil :incomplete nil})))
