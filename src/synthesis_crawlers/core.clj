@@ -54,6 +54,15 @@
   [attr-extractors]
   (select-keys attr-extractors (filter #(get attr-extractors %)  (keys attr-extractors))))
 
+(s/fdef empty-extractor?
+        :args (s/cat :extractor (s/map-of (s/or :contains ::container-extractor :empty nil?) 
+                                          (s/map-of keyword? #(or (string? %) (nil? %))))))
+(s/def ::empty-extractor (s/map-of nil? (s/map-of keyword? nil?)))
+(defn empty-extractor?
+  [extractor]
+  (s/valid? ::empty-extractor extractor))
+
+
 ;; todo filter nil filter
 #_(defn extract-knowledge
     [attrs pages extractors knowledge]
