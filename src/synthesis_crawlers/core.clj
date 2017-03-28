@@ -41,7 +41,9 @@
         extracted-list (for [container-extractor (keys extractors)
                              container (.select root container-extractor)]; container-extractor: container-expr
                          ; coll: map entries[attr: expr]
-                         (reduce #(assoc %1 (first %2) (.text (.select container (second %2)))) {} (get extractors container-extractor)))]
+                         (reduce #(assoc %1 (first %2) (.text (.select container (second %2)))) 
+                                 {} 
+                                 (get extractors container-extractor)))]
     (reduce #(assoc %1 (first %2) (if (set? (second %2)) (second %2) (set (list (second %2))))) 
             {} 
             (apply (partial merge-with #(set %&)) extracted-list))))
@@ -62,6 +64,7 @@
   [extractor]
   (s/valid? ::empty-extractor extractor))
 
+;; split-with
 
 ;; todo filter nil filter
 #_(defn extract-knowledge
