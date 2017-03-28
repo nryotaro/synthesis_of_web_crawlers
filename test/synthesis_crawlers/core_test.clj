@@ -35,7 +35,12 @@
            {:title #{"Installing Atom packages on Windows behind a proxy"}
             :date #{"August 14, 2016"}})))
 
-  (testing "extrtacts knowledge"
+(deftest filter-undefined-extractor-test
+  (testing "drops the undefined expressions of attributes"
+    (is (= (drop-undef-attr-extractors {:title nil :date ""})
+           {:date ""}))))
+
+  #_(testing "extrtacts knowledge"
     (is (= (extract-instance #{:title :price} 
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
                              #{["container-expr" {:title "title-expr" :price "price-expr"}]}

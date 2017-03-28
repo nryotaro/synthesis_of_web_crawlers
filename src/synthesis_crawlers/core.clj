@@ -46,10 +46,19 @@
             {} 
             (apply (partial merge-with #(set %&)) extracted-list))))
 
+;; If container is empty, it is interpreted as a node descriptor that extracts the root of the page. 
+;; If container is empty and f is undefined for every attribute, we say that the data extractor is empty.
+(s/fdef drop-undef-attr-extractors
+        :args (s/cat :extractors (s/map-of keyword? #(or (string? %) (nil? %)))))
+(defn drop-undef-attr-extractors
+  [attr-extractors]
+  (select-keys attr-extractors (filter #(get attr-extractors %)  (keys attr-extractors))))
+
 ;; todo filter nil filter
-(defn extract-knowledge
-  [attrs pages extractors knowledge]
-  (for [page pages]
-    (Jsoup/parse (get-page page))))
-(doseq [elem (.select (.get (Jsoup/connect url)) "#html")](println (.html elem) ))
-(println (.html (.select (.get (Jsoup/connect url)) "html > body > div[id=content]")))
+#_(defn extract-knowledge
+    [attrs pages extractors knowledge]
+    (for [page pages]
+      (Jsoup/parse (get-page page))))
+
+#_(doseq [elem (.select (.get (Jsoup/connect url)) "#html")](println (.html elem) ))
+#_(println (.html (.select (.get (Jsoup/connect url)) "html > body > div[id=content]")))
