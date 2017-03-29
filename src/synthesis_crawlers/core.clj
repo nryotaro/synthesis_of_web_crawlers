@@ -37,8 +37,9 @@
   (let [built (for [[container attr-extractors] extractors
                     [attr attr-expr] attr-extractors]
                 (build-selector attr container attr-expr))]
-    (println (map first (map seq built)))
-    (apply (partial merge-with #(set %&)) built)))
+    (reduce #(assoc %1 (first %2) (conj (get %1 (first %2) #{}) (second %2))) 
+            {} 
+            (map first (map seq built)))))
 
 (s/def ::attr-extractor (s/map-of keyword? string?))
 (s/def ::container-extractor string?)
