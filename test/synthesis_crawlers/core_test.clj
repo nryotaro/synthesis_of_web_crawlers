@@ -37,19 +37,20 @@
 
 (deftest build-selectors-test
   (testing "converts the specified extractors to the selector map"
-    (is (= (build-selectors {"html" {:a "body"}})
+    (is (= (build-selectors {"html" {:a "body" :b "head"} "foo" {:bar "bar" :a "hi"}})
            {:a "html > body"}))))
 
-#_(deftest extract-instance-test
+(deftest extract-instance-test
   (testing "tries extracting values with expressions"
     (let [text (slurp "dev-resources/index.html")]
       #_(is (= (extract text
                       {"html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title]" {:title "h2 > a" :date "time[class=published]"}}) 
              {:title #{"Installing Atom packages on Windows behind a proxy"}
               :date #{"August 14, 2016"}}))
-      (is (= (extract text
+      #_(is (= (extract text
                       {"" {:title "html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title] > h2 > a" 
-                           :date "html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title] > time[class=published]"}}) 
+                           :date "html > body > div[id=wrapper] > div[id=main] > article[class=post] > header > div[class=title] > time[class=published]"}
+                       "foo" {:date "bar"}}) 
              {:title #{"Installing Atom packages on Windows behind a proxy"}
               :date #{"August 14, 2016"}})))))
 

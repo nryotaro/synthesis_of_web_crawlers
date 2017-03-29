@@ -34,7 +34,11 @@
 
 (defn build-selectors
   [extractors]
-  nil)
+  (let [built (for [[container attr-extractors] extractors
+                    [attr attr-expr] attr-extractors]
+                (build-selector attr container attr-expr))]
+    (println (map first (map seq built)))
+    (apply (partial merge-with #(set %&)) built)))
 
 (s/def ::attr-extractor (s/map-of keyword? string?))
 (s/def ::container-extractor string?)
@@ -44,21 +48,13 @@
 (s/fdef extract
         :args (s/cat :text ::text :extractors ::extractors)
         :ret (s/map-of keyword? set?))
-(defn extract
+#_(defn extract
   [text extractors]
   (let [root (Jsoup/parse text)
-        extracted-list (for [container-extractor (keys extractors)
-                             container (.select root container-extractor)]; container-extractor: container-expr
-                         ; coll: map entries[attr: expr]
-
-                           (reduce #(assoc %1 (first %2) (.text (.select container (second %2)))) 
-                                   {} 
-                                   (get extractors container-extractor))
-                           )]
-    (println extracted-list)
-    (reduce #(assoc %1 (first %2) (if (set? (second %2)) (second %2) (set (list (second %2))))) 
-            {} 
-            (apply (partial merge-with #(set %&)) extracted-list))))
+        extracted-list (for [[container-extractor attr-extractors] extractors
+                             [attr attr-extractor] attr-extractors]
+                             (build-selector attr container-extractor attr-extractor))]
+    extracted-list))
 
 ;; If container is empty, it is interpreted as a node descriptor that extracts the root of the page. 
 ;; If container is empty and f is undefined for every attribute, we say that the data extractor is empty.
