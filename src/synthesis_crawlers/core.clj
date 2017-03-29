@@ -30,7 +30,7 @@
 (s/def ::container-extractor string?)
 (s/def ::complete-attr-extractor (s/map-of keyword? string?))
 (s/def ::text string?)
-(s/def ::extractors (s/map-of ::container-extractor ::attr-extractor))
+(s/def ::extractor (s/map-of ::container-extractor ::attr-extractor))
 (s/def ::complete-extractor (s/map-of ::container-extractor
                                       ::complete-attr-extractor))
 (defn build-selector [attribute container-expr attr-expr]
@@ -49,7 +49,7 @@
   (select-keys attr-extractors (filter #(get attr-extractors %)  (keys attr-extractors))))
 
 (s/fdef build-selectors
-        :ars (s/cat :extractors ::extractors))
+        :ars (s/cat :extractors ::extractor))
 (defn build-selectors
   [extractors]
   (let [built (for [[container attr-extractors] extractors
@@ -60,7 +60,7 @@
             (map first (map seq built)))))
 
 (s/fdef extract
-        :args (s/cat :text ::text :extractors ::extractors)
+        :args (s/cat :text ::text :extractors ::extractor)
         :ret (s/map-of keyword? set?))
 (defn extract
   [text extractors]
