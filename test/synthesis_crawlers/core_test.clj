@@ -73,7 +73,7 @@
   (is (= (empty-extractor? {"" {:a nil}}) 
          true)))
 
-  #_(testing "extrtacts knowledge"
+#_(testing "extrtacts knowledge"
     (is (= (extract-instance #{:title :price} 
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
                              #{["container-expr" {:title "title-expr" :price "price-expr"}]}
@@ -84,5 +84,4 @@
   (testing "returns true value iff the specified extractor is incomplete"
     (is (incomplete-extractors? {"html" {:a "body" :b nil}}))
     (is (incomplete-extractors? {"" {:a nil :b nil}}))
-    (is (not (incomplete-extractors? {"html" {:a "body" :b "header"}})))
-    ))
+    (is (not (incomplete-extractors? {"html" {:a "body" :b "header"}})))))

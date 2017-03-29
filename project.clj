@@ -4,6 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha15"]
+                 [info.debatty/java-string-similarity "0.23"]
                  [org.jsoup/jsoup "1.10.2"]
                  [http-kit "2.2.0"]]
   :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.19.0"]]
