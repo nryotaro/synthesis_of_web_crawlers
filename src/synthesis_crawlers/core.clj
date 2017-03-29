@@ -73,7 +73,6 @@
 (s/fdef empty-extractor?
         :args (s/cat :extractor (s/map-of ::container-extractor 
                                           (s/map-of keyword? #(or (string? %) (nil? %))))))
-
 (s/def ::empty-extractor (s/map-of #(= "" %) (s/map-of keyword? nil?)))
 (defn empty-extractor?
   "returns a non nil value iff the specifiled extractor is empty"
@@ -81,12 +80,3 @@
   (s/valid? ::empty-extractor extractor))
 
 ;; split-with
-
-;; todo filter nil filter
-#_(defn extract-knowledge
-    [attrs pages extractors knowledge]
-    (for [page pages]
-      (Jsoup/parse (get-page page))))
-
-#_(doseq [elem (.select (.get (Jsoup/connect url)) "#html")](println (.html elem) ))
-#_(println (.html (.select (.get (Jsoup/connect url)) "html > body > div[id=content]")))
