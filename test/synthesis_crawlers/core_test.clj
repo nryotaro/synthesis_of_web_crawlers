@@ -79,3 +79,9 @@
                              #{["container-expr" {:title "title-expr" :price "price-expr"}]}
                              #{}) 
            {:complete nil :knowledge nil :incomplete nil})))
+
+(deftest incomplete-extractors?-test
+  (testing "returns true value iff the specified extractor is incomplete"
+    (is (incomplete-extractors? {"html" {:a "body" :b nil}}))
+    (is (not (incomplete-extractors? {"html" {:a "body" :b "header"}})))
+    ))
