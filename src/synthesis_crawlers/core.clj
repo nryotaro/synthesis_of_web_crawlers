@@ -31,7 +31,8 @@
 (s/def ::complete-attr-extractor (s/map-of keyword? string?))
 (s/def ::text string?)
 (s/def ::extractors (s/map-of ::container-extractor ::attr-extractor))
-
+(s/def ::complete-extractor (s/map-of ::container-extractor
+                                      ::complete-attr-extractor))
 (defn build-selector [attribute container-expr attr-expr]
   {attribute 
    (cond
@@ -80,3 +81,7 @@
   (s/valid? ::empty-extractor extractor))
 
 ;; split-with
+
+(defn incomplete-extractors?
+  [extractor]
+  (not (s/valid? ::complete-extractor extractor)))
