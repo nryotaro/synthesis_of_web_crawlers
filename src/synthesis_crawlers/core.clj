@@ -26,36 +26,18 @@
   (:body @(http/get url)))
 
 
+(s/def ::attr-extractor (s/map-of keyword? string?))
+(s/def ::container-extractor string?)
+(s/def ::complete-attr-extractor (s/map-of keyword? string?))
+(s/def ::text string?)
+(s/def ::extractors (s/map-of ::container-extractor ::attr-extractor))
+
 (defn build-selector [attribute container-expr attr-expr]
   {attribute 
    (cond
      (empty? container-expr) attr-expr
      :else (str container-expr " > " attr-expr))})
 
-(defn build-selectors
-  [extractors]
-  (let [built (for [[container attr-extractors] extractors
-                    [attr attr-expr] attr-extractors]
-                (build-selector attr container attr-expr))]
-    (reduce #(assoc %1 (first %2) (conj (get %1 (first %2) #{}) (second %2))) 
-            {} 
-            (map first (map seq built)))))
-
-(s/def ::attr-extractor (s/map-of keyword? string?))
-(s/def ::container-extractor string?)
-(s/def ::complete-attr-extractor (s/map-of keyword? string?))
-(s/def ::text string?)
-(s/def ::extractors (s/map-of ::container-extractor ::attr-extractor))
-(s/fdef extract
-        :args (s/cat :text ::text :extractors ::extractors)
-        :ret (s/map-of keyword? set?))
-#_(defn extract
-  [text extractors]
-  (let [root (Jsoup/parse text)
-        extracted-list (for [[container-extractor attr-extractors] extractors
-                             [attr attr-extractor] attr-extractors]
-                             (build-selector attr container-extractor attr-extractor))]
-    extracted-list))
 
 ;; If container is empty, it is interpreted as a node descriptor that extracts the root of the page. 
 ;; If container is empty and f is undefined for every attribute, we say that the data extractor is empty.
@@ -64,6 +46,29 @@
 (defn drop-undef-attr-extractors
   [attr-extractors]
   (select-keys attr-extractors (filter #(get attr-extractors %)  (keys attr-extractors))))
+
+(s/fdef build-selectors
+        :ars (s/cat :extractors ::extractors))
+(defn build-selectors
+  [extractors]
+  (let [built (for [[container attr-extractors] extractors
+                    [attr attr-expr] (drop-undef-attr-extractors attr-extractors)]
+                (build-selector attr container attr-expr))]
+    (reduce #(assoc %1 (first %2) (conj (get %1 (first %2) #{}) (second %2))) 
+            {} 
+            (map first (map seq built)))))
+
+(s/fdef extract
+        :args (s/cat :text ::text :extractors ::extractors)
+        :ret (s/map-of keyword? set?))
+(defn extract
+  [text extractors]
+  (let [root (Jsoup/parse text)
+        attr-selectors (build-selectors extractors)]
+    (into {}
+          (for [[attr exprs] attr-selectors]
+            [attr (set (filter #(not (empty? %)) (map #(.text (.select root %)) exprs)))]))))
+
 
 (s/fdef empty-extractor?
         :args (s/cat :extractor (s/map-of ::container-extractor 
