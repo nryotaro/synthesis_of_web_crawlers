@@ -83,5 +83,6 @@
 (deftest incomplete-extractors?-test
   (testing "returns true value iff the specified extractor is incomplete"
     (is (incomplete-extractors? {"html" {:a "body" :b nil}}))
+    (is (incomplete-extractors? {"" {:a nil :b nil}}))
     (is (not (incomplete-extractors? {"html" {:a "body" :b "header"}})))
     ))
