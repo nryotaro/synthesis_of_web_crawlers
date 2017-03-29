@@ -73,6 +73,11 @@
   (is (= (empty-extractor? {"" {:a nil}}) 
          true)))
 
+(deftest calc-similarity-test
+  (testing "returns text similarity coefficient"
+    (is (= (similarity "asds" "asds")
+           1.0))))
+
 #_(testing "extrtacts knowledge"
     (is (= (extract-instance #{:title :price} 
                              #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
