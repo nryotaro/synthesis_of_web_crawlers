@@ -3,7 +3,13 @@
             [org.httpkit.client :as http]
             [clojure.data :refer [diff]])
   (:import (org.jsoup Jsoup)
-           (org.jsoup.select Elements)))
+           (org.jsoup.select Elements)
+           (info.debatty.java.stringsimilarity Jaccard)))
+
+(defn similarity
+  "returns true value iff the specified extractor is incomplete"
+  [a b]
+ (.similarity (Jaccard.) a b))
 
 (defn- diff? [a b]
   (let [a-b-c (diff a b)] (or (first a-b-c) (second a-b-c))))
@@ -85,3 +91,5 @@
 (defn incomplete-extractors?
   [extractor]
   (not (s/valid? ::complete-extractor extractor)))
+
+
