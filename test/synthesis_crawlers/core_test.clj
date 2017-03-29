@@ -38,7 +38,9 @@
 (deftest build-selectors-test
   (testing "converts the specified extractors to the selector map"
     (is (= (build-selectors {"html" {:a "body" :b "head"} "foo" {:bar "bar" :a "hi"}})
-           {:a "html > body"}))))
+           {:a #{"foo > hi" "html > body"}, 
+            :b #{"html > head"}, 
+            :bar #{"foo > bar"}}))))
 
 (deftest extract-instance-test
   (testing "tries extracting values with expressions"
