@@ -93,8 +93,8 @@
 
 (deftest extract-links-test
   (testing "returns all the links in the specified url"
-    (is (= (extract-links "http://nryotaro.org" (slurp "dev-resources/index.html"))
-           nil))
+    (is (= (extract-links "http://nryotaro.org" (slurp "dev-resources/synthesis_crawlers/extract_links.html"))
+           '("https://foobar/hoge" "http://nryotaro.org/news")))
     ))
 (deftest fetch-web-pages-test
   #_(testing "fetches web pages"
