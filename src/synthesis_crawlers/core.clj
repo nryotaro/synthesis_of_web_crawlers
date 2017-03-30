@@ -27,7 +27,6 @@
   [extractor crawled-set]
   (crawled-set extractor))
 
-;; TODO return nil if it failed to access the specifined url 
 (defn get-page
   "gets the specified web page and return its body"
   [url]
@@ -109,6 +108,9 @@
   [url root-url pattern to-be-crawled crawled-pages]
   (lazy-seq
     (cons
-      (let [matched-links  (filter some? (map #(let [found (re-seq pattern %)] (when found (first found))) (extract-links root-url (get-page url))))]
-        matched-links)
+      (let [matched-links  (filter some? (map #(let [found (re-seq pattern %)] (when found (first found))) (extract-links root-url (get-page url))))
+            uncrawled-links (filter #(not (crawled-pages %)) matched-links)]
+        uncrawled-links)
       nil)))
+
+#_(filter #(#{2} %)  [2 45 5])
