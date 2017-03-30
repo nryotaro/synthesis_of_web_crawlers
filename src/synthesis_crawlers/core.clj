@@ -105,12 +105,14 @@
          (filter #(.hasAttr % "href") (.getElementsByTag root "a")))))
 
 (defn fetch-urls
-  [url root-url pattern to-be-crawled crawled-pages]
-  (lazy-seq
-    (cons
-      (let [matched-links  (filter some? (map #(let [found (re-seq pattern %)] (when found (first found))) (extract-links root-url (get-page url))))
-            uncrawled-links (filter #(not (crawled-pages %)) matched-links)]
-        uncrawled-links)
-      nil)))
-
-#_(filter #(#{2} %)  [2 45 5])
+  [urls root-url pattern crawled-pages]
+  (when (seq urls)
+    (let [url (first urls)
+          matched-links  (filter some? 
+                                 (map #(let [found (re-seq pattern %)] 
+                                         (when found (first found))) 
+                                      (extract-links root-url (get-page url))))
+          uncrawled-links (filter #(not (crawled-pages %)) matched-links)]
+      (lazy-seq 
+        (cons url 
+              (fetch-urls (rest (into urls uncrawled-links)) root-url pattern (conj crawled-pages url)))))))
