@@ -81,12 +81,6 @@
     (is (= (similarity "asds" "asds")
            1.0))))
 
-#_(testing "extrtacts knowledge"
-    (is (= (extract-instance #{:title :price} 
-                             #{"http://www.barnesandnoble.com/w/living-clojure-carin-meier/1120914833?ean=9781491909041"}
-                             #{["container-expr" {:title "title-expr" :price "price-expr"}]}
-                             #{}) 
-           {:complete nil :knowledge nil :incomplete nil})))
 
 (deftest incomplete-extractors?-test
   (testing "returns true value iff the specified extractor is incomplete"
@@ -109,5 +103,7 @@
 
 #_(deftest find-attr-nodes-test
   (testing "finds nodes which contain the specified attributes"
-    )
-  )
+    (let [text (slurp "dev-resources/synthesis_crawlers/find_attr_nodes.html")]
+      (println text)
+      #_(is (= (find-att-node nodes knowledge) 
+             nil)))))
