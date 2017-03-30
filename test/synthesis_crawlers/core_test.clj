@@ -107,3 +107,7 @@
                                #{})) 
            '("http://www.economist.com")))))
 
+#_(deftest find-attr-nodes-test
+  (testing "finds nodes which contain the specified attributes"
+    )
+  )
