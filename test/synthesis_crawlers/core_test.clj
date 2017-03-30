@@ -100,8 +100,9 @@
            '("https://foobar/hoge" "http://nryotaro.org/news")))
     ))
 (deftest fetch-web-pages-test
-  #_(testing "fetches web pages"
+  (testing "fetches web pages"
     (is (= (take 2 (fetch-urls "http://www.economist.com" 
+                               "http://www.economist.com"
                                #"^http://www\.economist\.com/blogs/.+$" 
                                []
                                #{})) 

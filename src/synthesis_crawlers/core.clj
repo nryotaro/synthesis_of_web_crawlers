@@ -105,9 +105,10 @@
               :else href)) 
          (filter #(.hasAttr % "href") (.getElementsByTag root "a")))))
 
-#_(defn fetch-urls
-  [url pattern crawled-pages]
+(defn fetch-urls
+  [url root-url pattern to-be-crawled crawled-pages]
   (lazy-seq
     (cons
-      (get-page url)
+      (let [matched-links  (filter some? (map #(let [found (re-seq pattern %)] (when found (first found))) (extract-links root-url (get-page url))))]
+        matched-links)
       nil)))
