@@ -90,3 +90,14 @@
     (is (incomplete-extractors? {"html" {:a "body" :b nil}}))
     (is (incomplete-extractors? {"" {:a nil :b nil}}))
     (is (not (incomplete-extractors? {"html" {:a "body" :b "header"}})))))
+
+(deftest extract-links-test
+  (testing "returns all the links in the specified url"
+    (is (= (extract-links "http://nryotaro.org" (slurp "dev-resources/index.html"))
+           nil))
+    ))
+(deftest fetch-web-pages-test
+  #_(testing "fetches web pages"
+    (is (= (take 2 (fetch-urls "http://www.economist.com/" #"^http://www\.economist\.com/blogs/.+$" #{})) 
+           nil))))
+
