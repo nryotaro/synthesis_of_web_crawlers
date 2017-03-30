@@ -101,10 +101,9 @@
     ))
 (deftest fetch-web-pages-test
   (testing "fetches web pages"
-    (is (= (take 2 (fetch-urls "http://www.economist.com" 
+    (is (= (take 1 (fetch-urls ["http://www.economist.com" ]
                                "http://www.economist.com"
                                #"^http://www\.economist\.com/blogs/.+$" 
-                               []
                                #{})) 
-           nil))))
+           '("http://www.economist.com")))))
 
