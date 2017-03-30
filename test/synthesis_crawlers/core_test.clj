@@ -24,9 +24,12 @@
   (testing "returns something if the specified extractor is used"
     (is (crawled? {"site-url" ["container-expr" {:attr "partial-expr"}]} #{{"site-url" ["container-expr" {:attr "partial-expr"}]}}))))
 
-#_(deftest get-page-test
-    (testing "gets the specified web page and return its body"
-      (is (starts-with? (get-page "http://www.http-kit.org/") "<!DOC"))))
+(deftest get-page-test
+    (testing "Gets the specified web page and return its body. 
+              If the specified page is not found, it will return nil."
+      (is (starts-with? (get-page "http://www.http-kit.org/") "<!DOC"))
+      (is (= (get-page "https://hoasdfasdfa/") nil))
+      ))
 
 (deftest build-selector-test
   (testing "builds a selector"
@@ -98,6 +101,9 @@
     ))
 (deftest fetch-web-pages-test
   #_(testing "fetches web pages"
-    (is (= (take 2 (fetch-urls "http://www.economist.com/" #"^http://www\.economist\.com/blogs/.+$" #{})) 
+    (is (= (take 2 (fetch-urls "http://www.economist.com" 
+                               #"^http://www\.economist\.com/blogs/.+$" 
+                               []
+                               #{})) 
            nil))))
 
