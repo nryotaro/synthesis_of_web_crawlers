@@ -126,3 +126,4 @@
   [text knowledge]
   (filter #(>= (similarity text %) 0.5 )
           knowledge))
+
