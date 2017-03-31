@@ -104,12 +104,6 @@
 
 ; find textnode  fetch all
 
-#_(deftest find-textnodes-test
-  (testing "finds textnodes which aren't just whitespace in the specified text"
-    (let [text (slurp "dev-resources/synthesis_crawlers/find_textnodes.html")]
-      (is (= (count (find-textnodes text))
-             3)))))
-
 (deftest match-knowledge-test
   (testing "returns the subset of knowledge which are similar to the specified text"
     (is (= (matched-knowledge "foobar" #{"foobar"}) 
