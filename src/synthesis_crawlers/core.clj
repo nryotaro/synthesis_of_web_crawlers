@@ -8,6 +8,7 @@
            (org.jsoup.nodes Element)
            (info.debatty.java.stringsimilarity Jaccard)))
 
+(s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
   "returns true value iff the specified extractor is incomplete"
   [a b]
@@ -119,14 +120,15 @@
         (cons url 
               (fetch-urls (rest (into urls uncrawled-links)) root-url pattern (conj crawled-pages url)))))))
 
-(defn find-textnodes
+#_(defn find-textnodes
   [text]
   (for [textnodes (map #(.textNodes %) (.getAllElements (Jsoup/parse text)))
         textnode (filter (fn [node] ((every-pred string? #(re-seq #"\S+" %)) (.text node))) textnodes)]
     textnode))
 
-#_(s/fdef find-att-node
-        :args (s/cat :node #(instance? Element %) :knowledge ::knowledge))
-#_(defn find-att-node
-  [^Element node knowledge]
-  (.text node))
+(s/fdef matched-knowledge
+        :args (s/cat :text ::text :knowledge ::knowledge))
+(defn matched-knowledge
+  [text knowledge]
+  (filter #(>= (similarity text %) 0.5 )
+          knowledge))
