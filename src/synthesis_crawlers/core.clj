@@ -120,12 +120,6 @@
         (cons url 
               (fetch-urls (rest (into urls uncrawled-links)) root-url pattern (conj crawled-pages url)))))))
 
-#_(defn find-textnodes
-  [text]
-  (for [textnodes (map #(.textNodes %) (.getAllElements (Jsoup/parse text)))
-        textnode (filter (fn [node] ((every-pred string? #(re-seq #"\S+" %)) (.text node))) textnodes)]
-    textnode))
-
 (s/fdef matched-knowledge
         :args (s/cat :text ::text :knowledge ::knowledge))
 (defn matched-knowledge
