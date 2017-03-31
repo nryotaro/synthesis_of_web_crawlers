@@ -3,7 +3,9 @@
             [clojure.spec :as s]
             [clojure.spec.test :as stest]
             [clojure.string :refer [starts-with?]]
-            [synthesis-crawlers.core :refer :all]))
+            [synthesis-crawlers.core :refer :all])
+  (:import (org.jsoup Jsoup)
+           (org.jsoup.nodes Element)))
 
 (stest/instrument)
 
@@ -81,7 +83,6 @@
     (is (= (similarity "asds" "asds")
            1.0))))
 
-
 (deftest incomplete-extractors?-test
   (testing "returns true value iff the specified extractor is incomplete"
     (is (incomplete-extractors? {"html" {:a "body" :b nil}}))
@@ -101,9 +102,22 @@
                                #{})) 
            '("http://www.economist.com")))))
 
+; find textnode  fetch all
+
+(deftest find-textnodes-test
+  (testing "finds textnodes which aren't just whitespace in the specified text"
+    (let [text (slurp "dev-resources/synthesis_crawlers/find_textnodes.html")]
+      (is (= (count (find-textnodes text))
+             3)))))
+
 #_(deftest find-attr-nodes-test
   (testing "finds nodes which contain the specified attributes"
     (let [text (slurp "dev-resources/synthesis_crawlers/find_attr_nodes.html")]
-      (println text)
-      #_(is (= (find-att-node nodes knowledge) 
+      (doseq [elem (.getAllElements (Jsoup/parse text))]
+        (println (map #(.text %)  (.textNodes elem)))
+        (println (type elem))
+        (println (.textNodes elem)))
+      #_(println (.appendText ( Element. "div") "lorem ipsum"))
+      (is (= (find-att-node (.appendText ( Element. "div") "lorem ipsum") #{"lorem"}) 
              nil)))))
+
