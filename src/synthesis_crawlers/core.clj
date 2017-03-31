@@ -5,6 +5,7 @@
             [clojure.data :refer [diff]])
   (:import (org.jsoup Jsoup)
            (org.jsoup.select Elements)
+           (org.jsoup.nodes Element)
            (info.debatty.java.stringsimilarity Jaccard)))
 
 (defn similarity
@@ -33,6 +34,7 @@
   (:body @(http/get url)))
 
 
+(s/def ::knowledge (s/coll-of string?))
 (s/def ::attr-extractor (s/map-of keyword? string?))
 (s/def ::container-extractor string?)
 (s/def ::complete-attr-extractor (s/map-of keyword? string?))
@@ -116,3 +118,15 @@
       (lazy-seq 
         (cons url 
               (fetch-urls (rest (into urls uncrawled-links)) root-url pattern (conj crawled-pages url)))))))
+
+(defn find-textnodes
+  [text]
+  (for [textnodes (map #(.textNodes %) (.getAllElements (Jsoup/parse text)))
+        textnode (filter (fn [node] ((every-pred string? #(re-seq #"\S+" %)) (.text node))) textnodes)]
+    textnode))
+
+#_(s/fdef find-att-node
+        :args (s/cat :node #(instance? Element %) :knowledge ::knowledge))
+#_(defn find-att-node
+  [^Element node knowledge]
+  (.text node))
