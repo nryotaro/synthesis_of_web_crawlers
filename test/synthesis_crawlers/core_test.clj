@@ -114,7 +114,12 @@
 (deftest find-attr-nodes-test
   (testing "returns the elements which contain text similar to the specified knowledge"
     (let [text (slurp "dev-resources/synthesis_crawlers/find_textnodes.html")]
-      (println (map #(.text %) (.getAllElements (Jsoup/parse text))))
-      #_(is (= (find-attr-nodes nodes knowledge) 
-             nil))
-      )))
+      (is (= (map #(.text %)
+                  (find-attr-nodes (.getAllElements (Jsoup/parse text))
+                                   #{"sed do eiusmod tempor"})) 
+             ["sed do eiusmod tempor"])))))
+
+#_(deftest a-test
+    (testing ""
+      (is (= nil 
+             nil))))
