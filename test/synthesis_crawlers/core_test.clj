@@ -109,5 +109,6 @@
 
 #_(deftest find-attr-nodes-test
   (testing "finds nodes which contain the specified attributes"
-    )
+    (slurp "dev-resources/synthesis_crawlers/find_attr_nodes.html")
+    (find-attr-nodes nodes knowledge))
   )
