@@ -127,3 +127,8 @@
   (filter #(>= (similarity text %) 0.5 )
           knowledge))
 
+(s/fdef find-attr-nodes
+        :args (s/cat :nodes #(instance? Elements %) :knowledge ::knowledge))
+(defn find-attr-nodes 
+  [nodes knowledge]
+  (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes))
