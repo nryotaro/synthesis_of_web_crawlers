@@ -133,12 +133,19 @@
                      {"site" {"container expr" {:title "containee expr"}}})
            nil))))
 
-(deftest a-test
+(deftest uncrawled-extractors-test
   (testing "returns uncrawled site extractors"
     (is (= (uncrawled-extractors {"site" {"container" {:attr "containee"}}
                                   "site2" {"container2" {:attr "containee2"}}}
                                  {"site" {"container" {:attr "containee"}}})
            {"site2" {"container2" {:attr "containee2"}}}))))
+
+(deftest extract-knowledge-test
+    (testing "extracts knwoledge from the specified site"
+      (is (= (extract-knowledge {"site" #""}
+                                {"site" {"container" {:attr "containee"}}})
+             {:attr #{"hoge"}}))))
+
 #_(deftest a-test
     (testing ""
       (is (= nil 
