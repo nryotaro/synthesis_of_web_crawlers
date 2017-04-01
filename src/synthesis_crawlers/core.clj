@@ -1,5 +1,6 @@
 (ns synthesis-crawlers.core
   (:require [clojure.spec :as s]
+            [synthesis-crawlers.page :as page]
             [clojure.string :refer [starts-with? ends-with?]]
             [org.httpkit.client :as http]
             [clojure.data :refer [diff]])
@@ -51,12 +52,6 @@
   [extractor crawled-set]
   (crawled-set extractor))
 
-(defn get-page
-  "gets the specified web page and return its body"
-  [url]
-  (:body @(http/get url)))
-
-
 
 (defn build-selector [attribute container-expr attr-expr]
   {attribute 
@@ -96,10 +91,11 @@
           (for [[attr exprs] attr-selectors]
             [attr (set (filter #(not (empty? %)) (map #(.text (.select root %)) exprs)))]))))
 
-(s/fdef extract-knowledge
+#_(s/fdef extract-knowledge
         :args (s/cat :sites ::sites :site-extractor ::site-extractor))
 (defn extract-knowledge
   [sites site-extractor]
+  ()
   nil)
 
 
@@ -117,30 +113,6 @@
 (defn incomplete-extractors?
   [extractor]
   (not (s/valid? ::complete-extractor extractor)))
-
-(s/fdef extract-links
-        :args (s/cat :root-url #(not (ends-with? % "/")) :html string?))
-(defn extract-links
-  [root-url html]
-  (let [root (Jsoup/parse html)]
-    (map #(let [href (.attr % "href")] 
-            (cond
-              (starts-with? href "/")  (str root-url href)
-              :else href)) 
-         (filter #(.hasAttr % "href") (.getElementsByTag root "a")))))
-
-(defn fetch-urls
-  [urls root-url pattern crawled-pages]
-  (when (seq urls)
-    (let [url (first urls)
-          matched-links  (filter some? 
-                                 (map #(let [found (re-seq pattern %)] 
-                                         (when found (first found))) 
-                                      (extract-links root-url (get-page url))))
-          uncrawled-links (filter #(not (crawled-pages %)) matched-links)]
-      (lazy-seq 
-        (cons url 
-              (fetch-urls (rest (into urls uncrawled-links)) root-url pattern (conj crawled-pages url)))))))
 
 (s/fdef matched-knowledge
         :args (s/cat :text ::text :knowledge ::knowledge)
