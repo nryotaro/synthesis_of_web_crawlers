@@ -132,6 +132,13 @@
                      {"site" #""}
                      {"site" {"container expr" {:title "containee expr"}}})
            nil))))
+
+(deftest a-test
+  (testing "returns uncrawled site extractors"
+    (is (= (uncrawled-extractors {"site" {"container" {:attr "containee"}}
+                                  "site2" {"container2" {:attr "containee2"}}}
+                                 {"site" {"container" {:attr "containee"}}})
+           {"site2" {"container2" {:attr "containee2"}}}))))
 #_(deftest a-test
     (testing ""
       (is (= nil 
