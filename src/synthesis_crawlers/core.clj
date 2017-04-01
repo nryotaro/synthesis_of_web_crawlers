@@ -35,12 +35,15 @@
   (:body @(http/get url)))
 
 
+(s/def ::attributes (s/coll-of keyword?))
+(s/def ::sites (s/map-of string? #(instance? java.util.regex.Pattern %)))
 (s/def ::knowledge (s/coll-of string?))
 (s/def ::attr-extractor (s/map-of keyword? string?))
 (s/def ::container-extractor string?)
 (s/def ::complete-attr-extractor (s/map-of keyword? string?))
-(s/def ::text string?)
 (s/def ::extractor (s/map-of ::container-extractor ::attr-extractor))
+(s/def ::site-extractor (s/map-of string? ::extractor))
+(s/def ::text string?)
 (s/def ::complete-extractor (s/map-of ::container-extractor
                                       ::complete-attr-extractor))
 (defn build-selector [attribute container-expr attr-expr]
@@ -135,3 +138,19 @@
   "returns the elements which contain text similar to the specified knowledge"
   [nodes knowledge]
   (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes))
+
+(s/fdef reach?
+        :args (s/cat :a #(instance? Element %) :b #(instance? Element %)))
+(defn reach?
+  [a b]
+  (->> (filter #(or (= a %) (= % b)) (.getAllElements a)) empty? not))
+
+(s/fdef synthesis
+        :args (s/cat :attributes ::attributes :sites ::sites :site-extractors ::site-extractor))
+(defn synthesis
+  [attributes sites site-extractors]
+  (loop [attr-knowledge {}
+         s-extractors site-extractors
+         crawled-extractors #{}]
+    ;returns uncrawled sites
+    nil))
