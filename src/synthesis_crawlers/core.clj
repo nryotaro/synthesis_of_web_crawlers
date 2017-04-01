@@ -20,9 +20,11 @@
 (s/def ::complete-extractor (s/map-of ::container-extractor
                                       ::complete-attr-extractor))
 
+
 (s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
   "returns true value iff the specified extractor is incomplete"
+
   [a b]
  (.similarity (Jaccard.) a b))
 
@@ -41,7 +43,7 @@
         :args (s/cat :site-extractors ::site-extractor 
                      :crawled-extractors ::site-extractor))
 (defn uncrawled-extractors
-  "returns uncrawled site extractors"
+  "Returns uncrawled site extractors."
   [site-extractors crawled-extractors]
   (first (diff site-extractors crawled-extractors)))
 
@@ -86,12 +88,19 @@
         :args (s/cat :text ::text :extractors ::extractor)
         :ret (s/map-of keyword? set?))
 (defn extract
+  "tries extracting values with expressions"
   [text extractors]
   (let [root (Jsoup/parse text)
         attr-selectors (build-selectors extractors)]
     (into {}
           (for [[attr exprs] attr-selectors]
             [attr (set (filter #(not (empty? %)) (map #(.text (.select root %)) exprs)))]))))
+
+(s/fdef extract-knowledge
+        :args (s/cat :sites ::sites :site-extractor ::site-extractor))
+(defn extract-knowledge
+  [sites site-extractor]
+  nil)
 
 
 (s/fdef empty-extractor?
@@ -164,6 +173,7 @@
   [attributes sites site-extractors]
   (loop [attr-knowledge {}
          s-extractors site-extractors
-         crawled-extractors #{}]
+         crawled-extractors {}]
+    (uncrawled-extractors s-extractors crawled-extractors)
     ;returns uncrawled sites
     nil))
