@@ -27,13 +27,6 @@
     (is (crawled? {"site-url" ["container-expr" {:attr "partial-expr"}]} 
                   #{{"site-url" ["container-expr" {:attr "partial-expr"}]}}))))
 
-(deftest get-page-test
-    (testing "Gets the specified web page and return its body. 
-              If the specified page is not found, it will return nil."
-      (is (starts-with? (get-page "http://www.http-kit.org/") "<!DOC"))
-      (is (= (get-page "https://hoasdfasdfa/") nil))
-      ))
-
 (deftest build-selector-test
   (testing "builds a selector"
     (is (= (build-selector :a "html" "body")
@@ -90,19 +83,6 @@
     (is (incomplete-extractors? {"" {:a nil :b nil}}))
     (is (not (incomplete-extractors? {"html" {:a "body" :b "header"}})))))
 
-(deftest extract-links-test
-  (testing "returns all the links in the specified url"
-    (is (= (extract-links "http://nryotaro.org" (slurp "dev-resources/synthesis_crawlers/extract_links.html"))
-           '("https://foobar/hoge" "http://nryotaro.org/news")))
-    ))
-(deftest fetch-web-pages-test
-  (testing "fetches web pages"
-    (is (= (take 1 (fetch-urls ["http://www.economist.com" ]
-                               "http://www.economist.com"
-                               #"^http://www\.economist\.com/blogs/.+$" 
-                               #{})) 
-           '("http://www.economist.com")))))
-
 ; find textnode  fetch all
 
 (deftest match-knowledge-test
@@ -140,7 +120,7 @@
                                  {"site" {"container" {:attr "containee"}}})
            {"site2" {"container2" {:attr "containee2"}}}))))
 
-(deftest extract-knowledge-test
+#_(deftest extract-knowledge-test
     (testing "extracts knwoledge from the specified site"
       (is (= (extract-knowledge {"site" #""}
                                 {"site" {"container" {:attr "containee"}}})
