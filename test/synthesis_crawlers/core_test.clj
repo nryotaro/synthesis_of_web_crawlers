@@ -24,7 +24,8 @@
 
 (deftest crawled-test
   (testing "returns something if the specified extractor is used"
-    (is (crawled? {"site-url" ["container-expr" {:attr "partial-expr"}]} #{{"site-url" ["container-expr" {:attr "partial-expr"}]}}))))
+    (is (crawled? {"site-url" ["container-expr" {:attr "partial-expr"}]} 
+                  #{{"site-url" ["container-expr" {:attr "partial-expr"}]}}))))
 
 (deftest get-page-test
     (testing "Gets the specified web page and return its body. 
@@ -119,11 +120,18 @@
                                    #{"sed do eiusmod tempor"})) 
              ["sed do eiusmod tempor"])))))
 
-#_(deftest reach?-test
+(deftest reach?-test
   (testing "returns true iff a contains d"
-    (is (= (reach? ) 
-           nil))))
+    (let [text (Jsoup/parse "<html><body><div><a>hoge</a></div></body></html>")]
+      (is (= (reach? (first (.select text "div")) (first (.select text "div > a"))) 
+             true)))))
 
+(deftest synthesis-test
+  (testing "tests synthesis"
+    (is (= (synthesis #{:title :date :contents} 
+                     {"site" #""}
+                     {"site" {"container expr" {:title "containee expr"}}})
+           nil))))
 #_(deftest a-test
     (testing ""
       (is (= nil 
