@@ -119,6 +119,11 @@
                                    #{"sed do eiusmod tempor"})) 
              ["sed do eiusmod tempor"])))))
 
+#_(deftest reach?-test
+  (testing "returns true iff a contains d"
+    (is (= (reach? ) 
+           nil))))
+
 #_(deftest a-test
     (testing ""
       (is (= nil 

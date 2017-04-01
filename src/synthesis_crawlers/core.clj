@@ -121,14 +121,17 @@
               (fetch-urls (rest (into urls uncrawled-links)) root-url pattern (conj crawled-pages url)))))))
 
 (s/fdef matched-knowledge
-        :args (s/cat :text ::text :knowledge ::knowledge))
+        :args (s/cat :text ::text :knowledge ::knowledge)
+        :ret ::knowledge)
 (defn matched-knowledge
   [text knowledge]
   (filter #(>= (similarity text %) 0.5 )
           knowledge))
 
 (s/fdef find-attr-nodes
-        :args (s/cat :nodes #(instance? Elements %) :knowledge ::knowledge))
+        :args (s/cat :nodes #(instance? Elements %) :knowledge ::knowledge)
+        :ret #(instance? Elements %))
 (defn find-attr-nodes 
+  "returns the elements which contain text similar to the specified knowledge"
   [nodes knowledge]
   (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes))
