@@ -9,10 +9,12 @@
            (org.jsoup.nodes Element)
            (info.debatty.java.stringsimilarity Jaccard)))
 
-(s/def ::attributes (s/coll-of keyword?))
+(s/def ::attribute keyword?)
+(s/def ::attributes (s/coll-of ::attribute))
 (s/def ::sites (s/map-of string? #(instance? java.util.regex.Pattern %)))
 (s/def ::knowledge (s/coll-of string?))
-(s/def ::attr-extractor (s/map-of keyword? string?))
+(s/def ::attr-knowledge (s/map-of  ::attribute ::knowledge))
+(s/def ::attr-extractor (s/map-of keyword? (s/or :complete string? :empty nil?)))
 (s/def ::container-extractor string?)
 (s/def ::complete-attr-extractor (s/map-of keyword? string?))
 (s/def ::extractor (s/map-of ::container-extractor ::attr-extractor))
@@ -97,7 +99,8 @@
 (s/fdef extract-knowledge
         :args (s/cat :sites ::sites 
                      :site-extractor ::site-extractor
-                     :crawled-extractors ::site-extractor))
+                     :crawled-extractors ::site-extractor)
+        :ret ::attr-knowledge)
 (defn extract-knowledge
   "extracts knwoledge from the specified site"
   [sites site-extractor crawled-extractors]
@@ -154,5 +157,8 @@
   (loop [attr-knowledge {}
          s-extractors site-extractors
          crawled-extractors {}]
-    (uncrawled-extractors s-extractors crawled-extractors)
+    (let [new-knowledge (merge-with into 
+                                    attr-knowledge 
+                                    (extract-knowledge sites s-extractors crawled-extractors))]
+      nil)
     nil))
