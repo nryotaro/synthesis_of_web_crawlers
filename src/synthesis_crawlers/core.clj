@@ -11,7 +11,9 @@
 
 (s/def ::attribute keyword?)
 (s/def ::attributes (s/coll-of ::attribute))
-(s/def ::sites (s/map-of string? #(instance? java.util.regex.Pattern %)))
+(s/def ::url-pattern #(instance? java.util.regex.Pattern %))
+(s/def ::pages (s/map-of string? string?))
+(s/def ::sites (s/map-of string? (s/keys :req-un [::url-pattern ::pages])))
 (s/def ::knowledge (s/coll-of string?))
 (s/def ::attr-knowledge (s/map-of  ::attribute ::knowledge))
 (s/def ::attr-extractor (s/map-of keyword? (s/or :complete string? :empty nil?)))
@@ -104,7 +106,7 @@
   "extracts knwoledge from the specified site"
   [sites site-extractor crawled-extractors]
   (let [extracted (for [[site extractor] (uncrawled-extractors site-extractor crawled-extractors)
-                        text (map page/get-page (take 10 (page/fetch-urls site (sites site))))] 
+                        text (vals (:pages (sites site)))] 
                     (extract text extractor))]
     (apply (partial merge-with into) extracted)))
 
@@ -159,8 +161,19 @@
     (let [new-knowledge (merge-with into 
                                     attr-knowledge 
                                     (extract-knowledge sites s-extractors crawled-extractors))]
-      (for [incomplete-extractor (filter (fn [[site container-extractor]]
+      (for [[site container-extractor] (filter (fn [[site container-extractor]]
                                            (incomplete-extractors? container-extractor)) 
                                          s-extractors)]
-        nil))
+        #_(let [nodes-inpages (find-nodes-inpage (sites site) container-extractor)]
+            nil)
+        ;; TODO
+        #_(reduce (fn [acc attribute]
+                  (assoc acc
+                         attribute
+                         (find-attr-nodes 
+                           (.getAllElements (Jsoup/parse page)) 
+                           (new-knowledge attribute)))) 
+                {} 
+                attributes)
+        ))
     nil))
