@@ -93,9 +93,10 @@
 
 #_(s/fdef extract-knowledge
         :args (s/cat :sites ::sites :site-extractor ::site-extractor))
-(defn extract-knowledge
+#_(defn extract-knowledge
   [sites site-extractor]
-  ()
+  (for [[site url-pattern] sites]
+    )
   nil)
 
 

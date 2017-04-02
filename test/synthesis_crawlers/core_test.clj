@@ -121,10 +121,10 @@
            {"site2" {"container2" {:attr "containee2"}}}))))
 
 #_(deftest extract-knowledge-test
-    (testing "extracts knwoledge from the specified site"
-      (is (= (extract-knowledge {"site" #""}
-                                {"site" {"container" {:attr "containee"}}})
-             {:attr #{"hoge"}}))))
+  (testing "extracts knwoledge from the specified site"
+    (is (= (extract-knowledge {"site" #"^http://google.com/.+$"}
+                              {"site" {"container" {:attr "containee"}}})
+           {:attr #{"hoge"}}))))
 
 #_(deftest a-test
     (testing ""
