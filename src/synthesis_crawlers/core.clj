@@ -23,7 +23,6 @@
 (s/def ::complete-extractor (s/map-of ::container-extractor
                                       ::complete-attr-extractor))
 
-
 (s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
   "returns true value iff the specified extractor is incomplete"
@@ -160,5 +159,8 @@
     (let [new-knowledge (merge-with into 
                                     attr-knowledge 
                                     (extract-knowledge sites s-extractors crawled-extractors))]
-      nil)
+      (for [incomplete-extractor (filter (fn [[site container-extractor]]
+                                           (incomplete-extractors? container-extractor)) 
+                                         s-extractors)]
+        nil))
     nil))

@@ -84,7 +84,6 @@
     (is (incomplete-extractors? {"" {:a nil :b nil}}))
     (is (not (incomplete-extractors? {"html" {:a "body" :b "header"}})))))
 
-; find textnode  fetch all
 
 (deftest match-knowledge-test
   (testing "returns the subset of knowledge which are similar to the specified text"
