@@ -42,7 +42,8 @@
 
 (s/fdef uncrawled-extractors
         :args (s/cat :site-extractors ::site-extractor 
-                     :crawled-extractors ::site-extractor))
+                     :crawled-extractors ::site-extractor)
+        :ret ::site-extractor)
 (defn uncrawled-extractors
   "Returns uncrawled site extractors."
   [site-extractors crawled-extractors]
@@ -80,24 +81,30 @@
             (map first (map seq built)))))
 
 (s/fdef extract
-        :args (s/cat :text ::text :extractors ::extractor)
+        :args (s/cat :text (s/or :text ::text :empty nil?) 
+                     :extractors ::extractor)
         :ret (s/map-of keyword? set?))
 (defn extract
   "tries extracting values with expressions"
   [text extractors]
-  (let [root (Jsoup/parse text)
-        attr-selectors (build-selectors extractors)]
-    (into {}
-          (for [[attr exprs] attr-selectors]
-            [attr (set (filter #(not (empty? %)) (map #(.text (.select root %)) exprs)))]))))
+  (when text
+    (let [root (Jsoup/parse text)
+          attr-selectors (build-selectors extractors)]
+      (into {}
+            (for [[attr exprs] attr-selectors]
+              [attr (set (filter #(not (empty? %)) (map #(.text (.select root %)) exprs)))])))))
 
-#_(s/fdef extract-knowledge
-        :args (s/cat :sites ::sites :site-extractor ::site-extractor))
-#_(defn extract-knowledge
-  [sites site-extractor]
-  (for [[site url-pattern] sites]
-    )
-  nil)
+(s/fdef extract-knowledge
+        :args (s/cat :sites ::sites 
+                     :site-extractor ::site-extractor
+                     :crawled-extractors ::site-extractor))
+(defn extract-knowledge
+  "extracts knwoledge from the specified site"
+  [sites site-extractor crawled-extractors]
+  (let [extracted (for [[site extractor] (uncrawled-extractors site-extractor crawled-extractors)
+                        text (map page/get-page (take 10 (page/fetch-urls site (sites site))))] 
+                    (extract text extractor))]
+    (apply (partial merge-with into) extracted)))
 
 
 (s/fdef empty-extractor?
@@ -148,5 +155,4 @@
          s-extractors site-extractors
          crawled-extractors {}]
     (uncrawled-extractors s-extractors crawled-extractors)
-    ;returns uncrawled sites
     nil))

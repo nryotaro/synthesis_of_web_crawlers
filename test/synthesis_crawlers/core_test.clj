@@ -1,6 +1,7 @@
 (ns synthesis-crawlers.core-test
   (:require [clojure.test :refer :all]
             [clojure.spec :as s]
+            [synthesis-crawlers.page :as page]
             [clojure.spec.test :as stest]
             [clojure.string :refer [starts-with?]]
             [synthesis-crawlers.core :refer :all])
@@ -120,11 +121,21 @@
                                  {"site" {"container" {:attr "containee"}}})
            {"site2" {"container2" {:attr "containee2"}}}))))
 
-#_(deftest extract-knowledge-test
+
+(deftest extract-knowledge-test
   (testing "extracts knwoledge from the specified site"
-    (is (= (extract-knowledge {"site" #"^http://google.com/.+$"}
-                              {"site" {"container" {:attr "containee"}}})
-           {:attr #{"hoge"}}))))
+    (with-redefs
+      [page/fetch-urls (fn [a b]
+                         ["http://www.economist.com/blogs/1"
+                          "http://www.economist.com/blogs/2"])
+       page/get-page (fn [url] 
+                       (case url
+                         "http://www.economist.com/blogs/1" "<html><body><div><span>All in the golden afternoon</span></div></body></html>"
+                         "http://www.economist.com/blogs/2" ""))]
+      (is (= (extract-knowledge {"http://www.economist.com" #"^http://www\.economist\.com/blogs/.+$"}
+                                {"http://www.economist.com" {"html > body > div" {:title "span"}}}
+                                {})
+             {:title #{"All in the golden afternoon"}})))))
 
 #_(deftest a-test
     (testing ""
