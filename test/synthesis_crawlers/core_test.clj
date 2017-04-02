@@ -106,13 +106,6 @@
       (is (= (reach? (first (.select text "div")) (first (.select text "div > a"))) 
              true)))))
 
-(deftest synthesis-test
-  (testing "tests synthesis"
-    (is (= (synthesis #{:title :date :contents} 
-                     {"site" #""}
-                     {"site" {"container expr" {:title "containee expr"}}})
-           nil))))
-
 (deftest uncrawled-extractors-test
   (testing "returns uncrawled site extractors"
     (is (= (uncrawled-extractors {"site" {"container" {:attr "containee"}}
@@ -123,20 +116,21 @@
 
 (deftest extract-knowledge-test
   (testing "extracts knwoledge from the specified site"
-    (with-redefs
-      [page/fetch-urls (fn [a b]
-                         ["http://www.economist.com/blogs/1"
-                          "http://www.economist.com/blogs/2"])
-       page/get-page (fn [url] 
-                       (case url
-                         "http://www.economist.com/blogs/1" "<html><body><div><span>All in the golden afternoon</span></div></body></html>"
-                         "http://www.economist.com/blogs/2" ""))]
-      (is (= (extract-knowledge {"http://www.economist.com" #"^http://www\.economist\.com/blogs/.+$"}
-                                {"http://www.economist.com" {"html > body > div" {:title "span"}}}
-                                {})
-             {:title #{"All in the golden afternoon"}})))))
+    (is (= (extract-knowledge {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" :pages {"http://www.economist.com/blogs/1" "<html><body><div><span>All in the golden afternoon</span></div></body></html>"
+                                                                                                                         "http://www.economist.com/blogs/2" ""
+                                                                                                                         }}}
+                              {"http://www.economist.com" {"html > body > div" {:title "span"}}}
+                              {})
+           {:title #{"All in the golden afternoon"}}))))
 
 #_(deftest a-test
     (testing ""
       (is (= nil 
              nil))))
+
+(deftest synthesis-test
+  (testing "tests synthesis"
+    (is (= (synthesis #{:title :date :contents} 
+                     {"site" {:url-pattern #"" :pages {"url" "text"}}}
+                     {"site" {"container expr" {:title "containee expr"}}})
+           nil))))
