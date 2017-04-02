@@ -14,15 +14,18 @@
   (:body @(http/get url)))
 
 (s/fdef extract-links
-        :args (s/cat :root-url #(not (ends-with? % "/")) :html string?))
+        :args (s/cat :root-url #(not (ends-with? % "/")) :html (s/or :text string?
+                                                                     :empty nil?))
+        :ret (s/coll-of string?))
 (defn extract-links
   [root-url html]
-  (let [root (Jsoup/parse html)]
-    (map #(let [href (.attr % "href")] 
-            (cond
-              (starts-with? href "/")  (str root-url href)
-              :else href)) 
-         (filter #(.hasAttr % "href") (.getElementsByTag root "a")))))
+  (when html
+    (let [root (Jsoup/parse html)]
+      (map #(let [href (.attr % "href")] 
+              (cond
+                (starts-with? href "/")  (str root-url href)
+                :else href)) 
+           (filter #(.hasAttr % "href") (.getElementsByTag root "a"))))))
 
 (defn fetch-urls
   ([first-url url-pattern]
