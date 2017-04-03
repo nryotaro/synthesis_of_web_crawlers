@@ -181,7 +181,8 @@
                                            (s/map-of keyword? 
                                                      (s/coll-of #(instance? Element %))))))
 (defn find-container-nodes [attr-nodes] 
-  (for [[url attr-nodes] attr-nodes] 
+  (for [[url attr-nodes] attr-nodes
+        [attr nodes] attr-nodes] 
     (let [best-attr-set (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))]
       best-attr-set)))
 
