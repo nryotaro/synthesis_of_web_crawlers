@@ -172,6 +172,18 @@
           {} 
           pages))
 
+(defn reachable-elements
+  [elem]
+  (conj (into [] (.parents elem)) elem))
+
+(s/fdef find-container-nodes
+        :args (s/cat :attr-nodes (s/map-of string? 
+                                           (s/map-of keyword? 
+                                                     (s/coll-of #(instance? Element %))))))
+(defn find-container-nodes [attr-nodes] 
+  (for [[url attr-nodes] attr-nodes] 
+    (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))))
+
 (s/fdef synthesis
         :args (s/cat :attributes 
                      ::attributes 
