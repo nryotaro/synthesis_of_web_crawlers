@@ -189,7 +189,9 @@
       (for [[site container-extractor] (filter (fn [[site container-extractor]]
                                                      (incomplete-extractors? container-extractor)) 
                                          s-extractors)]
-        (let [nodes-in-pages (find-nodes-in-page (:pages (sites site)) new-knowledge)]
+        (let [nodes-in-pages (find-nodes-in-page (:pages (sites site)) new-knowledge)
+              ;container-nodes (find-container-nodes (:pages (sites site))nodes-in-pages)
+              ]
           (for [[url page-text] (:pages (sites site))]
             (do
               (peek "url " url)
