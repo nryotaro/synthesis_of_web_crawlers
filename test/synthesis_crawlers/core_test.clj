@@ -141,9 +141,13 @@
 (deftest find-container-nodes-test
   (testing "finds nodes which can be candidates of conainters"
     (is (= (find-container-nodes 
-             {"http://foo.com" "<html></html>"}
              {"http://foo.com" {:title [(first (.getAllElements (Jsoup/parse "")))]}})
            nil))))
+
+(deftest reachable-elements-test
+  (testing "return reachable elements"
+    (let [elem (first (.select (Jsoup/parse "<html><body><div></div></body></html>") "html > body > div"))]
+      (is (= (count (reachable-elements elem)) 3)))))
 
 #_(deftest a-test
     (testing ""
