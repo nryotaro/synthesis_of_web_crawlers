@@ -130,12 +130,6 @@
           result (find-nodes-in-page {"http://foobar.com" text 
                                   "http://piyo.com" "<html></html>"} 
                                  {:title #{"hoge" "piyo"}})]
-      #_(doseq [[url va] result] 
-        (println "1-> " (first (:title (result "http://foobar.com"))))
-        (println "2-> " (first (.select nodes "html >body > div")))
-        #_(println (.select nodes "html >body > div"))
-        (println (= (first (.select nodes "html >body > div")) (:title (result "http://foobar.com"))))
-        )
       (is (= (count (:title (result "http://foobar.com"))) 1))
       (is (= (result "http://piyo.com") {:title []}))
       )))
