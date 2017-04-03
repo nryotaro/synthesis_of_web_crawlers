@@ -138,6 +138,13 @@
       (is (= (result "http://piyo.com") {:title []}))
       )))
 
+(deftest find-container-nodes-test
+  (testing "finds nodes which can be candidates of conainters"
+    (is (= (find-container-nodes 
+             {"http://foo.com" "<html></html>"}
+             {"http://foo.com" {:title [(first (.getAllElements (Jsoup/parse "")))]}})
+           nil))))
+
 #_(deftest a-test
     (testing ""
       (is (= nil 
