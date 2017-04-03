@@ -157,12 +157,18 @@
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
 (defn find-nodes-in-page
   [pages attr-knowledge]
-
   (reduce (fn [acc [url text]]
             (assoc acc 
                    url 
-                   (reduce (fn [k [attr knowledge-set]] (assoc k attr (find-attr-nodes (.getAllElements (Jsoup/parse text)) knowledge-set))) {} attr-knowledge)
-                   )) 
+                   (reduce 
+                     (fn [k [attr knowledge-set]] (assoc k 
+                                                         attr 
+                                                         (find-attr-nodes 
+                                                           (.getAllElements 
+                                                             (Jsoup/parse text)) 
+                                                           knowledge-set))) 
+                     {} 
+                     attr-knowledge))) 
           {} 
           pages))
 
