@@ -139,13 +139,13 @@
       (is (= nil 
              nil))))
 
-#_(deftest synthesis-test
+(deftest synthesis-test
   (testing "tests synthesis"
     (is (= (synthesis #{:title} 
                       {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" 
                                                    :pages {"http://www.economist.com/blogs/1" "<html><body><span>hello world</span></body></html>"}}
                        "http://www.newsweek.com" {:url-pattern #"^http://www\.newsweek\.com/.+$"
                                                   :pages {"http://www.newsweek.com/1" "<html><body><div>hello world1</div></body></html>"}}}
-                     {"http://www.economist.com" {"html > body" {:title "span"}}
-                      "http://www.newsweek.com" {"" {:title nil}}})
+                      {"http://www.economist.com" {"html > body" {:title "span"}}
+                       "http://www.newsweek.com" {"" {:title nil}}})
            nil))))
