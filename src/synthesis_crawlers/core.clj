@@ -25,6 +25,10 @@
 (s/def ::complete-extractor (s/map-of ::container-extractor
                                       ::complete-attr-extractor))
 
+(defn- peek 
+  ([title value] (do (println title ": " value) value))
+  ([value] (do (println value) value)))
+
 (s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
   "returns true value iff the specified extractor is incomplete"
@@ -148,6 +152,20 @@
   [a b]
   (->> (filter #(or (= a %) (= % b)) (.getAllElements a)) empty? not))
 
+
+(s/fdef find-nodes-in-page
+  :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
+(defn find-nodes-in-page
+  [pages attr-knowledge]
+
+  (reduce (fn [acc [url text]]
+            (assoc acc 
+                   url 
+                   (reduce (fn [k [attr knowledge-set]] (assoc k attr (find-attr-nodes (.getAllElements (Jsoup/parse text)) knowledge-set))) {} attr-knowledge)
+                   )) 
+          {} 
+          pages))
+
 (s/fdef synthesis
         :args (s/cat :attributes 
                      ::attributes 
@@ -161,19 +179,10 @@
     (let [new-knowledge (merge-with into 
                                     attr-knowledge 
                                     (extract-knowledge sites s-extractors crawled-extractors))]
+      ;; new-knowledge ::attr-knowledge
       (for [[site container-extractor] (filter (fn [[site container-extractor]]
-                                           (incomplete-extractors? container-extractor)) 
+                                                     (incomplete-extractors? container-extractor)) 
                                          s-extractors)]
-        #_(let [nodes-inpages (find-nodes-inpage (sites site) container-extractor)]
-            nil)
-        ;; TODO
-        #_(reduce (fn [acc attribute]
-                  (assoc acc
-                         attribute
-                         (find-attr-nodes 
-                           (.getAllElements (Jsoup/parse page)) 
-                           (new-knowledge attribute)))) 
-                {} 
-                attributes)
-        ))
-    nil))
+          (let [nodes-in-pages (find-nodes-in-page (:pages (sites site)) new-knowledge)]
+              nil)))))
+
