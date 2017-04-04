@@ -154,11 +154,17 @@
                                 html #{:date :title}
                                 body #{:date :title}
                                 span #{:date}}})))))
+(deftest find-support-nodes-test
+  (testing "returns nodes which can be reachable from the specified nodes, 
+            and contain attributes"
+    (is (= (find-support-nodes nil) 
+           nil))))
 
 (deftest reachable-elements-test
   (testing "return reachable elements"
     (let [elem (first (.select (Jsoup/parse "<html><body><div></div></body></html>") "html > body > div"))]
       (is (= (count (reachable-elements elem)) 3)))))
+
 
 #_(deftest a-test
     (testing ""
