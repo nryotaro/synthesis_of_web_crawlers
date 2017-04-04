@@ -156,9 +156,16 @@
                                 span #{:date}}})))))
 (deftest find-support-nodes-test
   (testing "returns nodes which can be reachable from the specified nodes, 
-            and contain attributes"
-    (is (= (find-support-nodes nil) 
-           nil))))
+           and contain attributes"
+    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-support-nodes.html"))
+          inner-div (first (.select text "html > body > div > div")) 
+          html (first (.select text "html")) 
+          body (first (.select text "html > body")) 
+          span (first (.select text "html > body > div > span")) 
+          outer-div (first (.select text "html > body > div"))]
+      (println text)
+      (is (= (find-support-nodes {"http://foo.com" {:title [inner-div] :date [span]}}) 
+             nil)))))
 
 (deftest reachable-elements-test
   (testing "return reachable elements"

@@ -192,6 +192,15 @@
             {} 
             result)))
 
+(s/fdef find-reachable-attrs
+        :args (s/cat :attr-nodes (s/map-of string? 
+                                           (s/map-of keyword? 
+                                                     (s/coll-of #(instance? Element %))))))
+;; TODO to be
+(defn find-support-nodes
+  [elems]
+  nil)
+
 #_(let [best-attr-set (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))]
     best-attr-set)
 
