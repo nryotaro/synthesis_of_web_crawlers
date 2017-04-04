@@ -176,22 +176,31 @@
   [elem]
   (conj (into [] (.parents elem)) elem))
 
-(s/fdef find-container-nodes
+(s/fdef find-reachable-attrs
         :args (s/cat :attr-nodes (s/map-of string? 
                                            (s/map-of keyword? 
                                                      (s/coll-of #(instance? Element %))))))
-(defn find-container-nodes [attr-nodes] 
-  (for [[url attr-nodes] attr-nodes
-        [attr nodes] attr-nodes] 
-    (let [best-attr-set (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))]
-      best-attr-set)))
+(defn find-reachable-attrs [attr-nodes] 
+  (let [result (for [[url attr-nodes] attr-nodes
+                     [attr nodes] attr-nodes
+                     node (set (flatten (map reachable-elements nodes)))] 
+                 [url [node attr]])]
+    (reduce (fn [acc [url [node attr]]] 
+              (let [node-attr (get acc url {})
+                    attrs (get node-attr node #{})]
+                (assoc acc url (assoc node-attr node (conj attrs attr)))))
+            {} 
+            result)))
+
+#_(let [best-attr-set (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))]
+    best-attr-set)
 
 (s/fdef synthesis
         :args (s/cat :attributes 
                      ::attributes 
                      :sites ::sites 
                      :site-extractors ::site-extractor))
-(defn synthesis
+#_(defn synthesis
   [attributes sites site-extractors]
   (loop [attr-knowledge {}
          s-extractors site-extractors

@@ -138,13 +138,22 @@
       (is (= (result "http://piyo.com") {:title []}))
       )))
 
-(deftest find-container-nodes-test
+(deftest find-reachable-attrs-test
   (testing "finds nodes which can be candidates of conainters"
-    (let [text (.getAllElements (Jsoup/parse "<html><body><div>a</div></body></html>"))]
-      (is (= (find-container-nodes 
-               {"http://foo.com" {:title [(first text)]}})
-             {"http://foo.com" {(first text) #{:title}}}
-             )))))
+    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
+         inner-div (first (.select text "html > body > div > div")) 
+         html (first (.select text "html")) 
+         body (first (.select text "html > body")) 
+         span (first (.select text "html > body > div > span")) 
+         outer-div (first (.select text "html > body > div"))
+         result (find-reachable-attrs 
+                  {"http://foo.com" {:title [inner-div] :date [span]}})]
+      (is (= result
+             {"http://foo.com" {inner-div #{:title}
+                                outer-div #{:date :title}
+                                html #{:date :title}
+                                body #{:date :title}
+                                span #{:date}}})))))
 
 (deftest reachable-elements-test
   (testing "return reachable elements"
