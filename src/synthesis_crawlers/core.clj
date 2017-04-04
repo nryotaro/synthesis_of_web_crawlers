@@ -180,7 +180,8 @@
         :args (s/cat :attr-nodes (s/map-of string? 
                                            (s/map-of keyword? 
                                                      (s/coll-of #(instance? Element %))))))
-(defn find-reachable-attrs [attr-nodes] 
+(defn find-reachable-attrs 
+  [attr-nodes] 
   (let [result (for [[url attr-nodes] attr-nodes
                      [attr nodes] attr-nodes
                      node (set (flatten (map reachable-elements nodes)))] 
@@ -191,6 +192,14 @@
                 (assoc acc url (assoc node-attr node (conj attrs attr)))))
             {} 
             result)))
+
+(s/fdef find-reachable-attrs
+        :args (s/cat :attr-nodes (s/map-of string? 
+                                           (s/map-of keyword? 
+                                                     (s/coll-of #(instance? Element %))))))
+(defn find-support-nodes
+  [url-attr-nodes]
+  nil)
 
 #_(let [best-attr-set (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))]
     best-attr-set)
