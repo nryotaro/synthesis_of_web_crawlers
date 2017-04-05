@@ -209,8 +209,8 @@
                 body #{:date :title}
                 span #{:date}}
                #{:title :date})
-             outer-div))
-      (is (= (find-container 
+             #{outer-div}))
+      #_(is (= (find-container 
                {"http://foo.com" {inner-div #{:title}
                                   outer-div #{:date :title}
                                   html #{:date :title}
