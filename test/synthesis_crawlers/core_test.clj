@@ -201,6 +201,14 @@
           result (find-best-attr-set
                    {"http://foo.com" {:title [inner-div] :date [span] :body []}})]
       (is (= (find-container-node 
+               {inner-div #{:title}
+                outer-div #{:date :title}
+                html #{:date :title}
+                body #{:date :title}
+                span #{:date}}
+               #{:title :date})
+             outer-div))
+      (is (= (find-container 
                {"http://foo.com" {inner-div #{:title}
                                   outer-div #{:date :title}
                                   html #{:date :title}
