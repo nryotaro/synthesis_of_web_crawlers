@@ -199,7 +199,16 @@
                                                      (s/coll-of #(instance? Element %))))))
 (defn find-support-nodes
   [url-attr-nodes]
-  nil)
+  (let [result (for [[url attr-nodes] url-attr-nodes
+                     [attr nodes] attr-nodes
+                     node (set (flatten (map reachable-elements nodes)))]
+                 [url [node nodes]])]
+    (reduce (fn [acc [url [node nodes]]] 
+              (let [node-nodes (get acc url {})
+                    node-set (get node-nodes node #{})]
+                (assoc acc url (assoc node-nodes node (into node-set nodes)))))
+            {}
+            result)))
 
 #_(let [best-attr-set (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))]
     best-attr-set)
