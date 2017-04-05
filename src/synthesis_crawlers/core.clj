@@ -152,7 +152,6 @@
   [a b]
   (->> (filter #(= % b) (.getAllElements a)) empty? not))
 
-
 (s/fdef find-nodes-in-page
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
 (defn find-nodes-in-page
@@ -225,11 +224,16 @@
 
 (defn find-container-node
   [node-attrs all-attrs] 
-  (reduce (fn [acc e] 
-            (if (reach? acc e) e) acc) 
-          (keys (into {}
-                      (filter (fn [[node attrs]] (= all-attrs attrs))
-                              node-attrs)))))
+  (set 
+    (reduce (fn [acc e] 
+              (let [removed (remove #(reach? % e) acc)]
+                (if-not (seq removed)
+                  (conj (filter #(not (reach? %) e) acc) e)
+                  acc)))
+            #{}
+            (keys (into {}
+                        (filter (fn [[node attrs]] (= all-attrs attrs))
+                                node-attrs))))))
 
 (s/fdef find-container
         :args (s/cat :reachable-attr-nodes
