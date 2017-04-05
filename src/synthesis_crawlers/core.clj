@@ -149,7 +149,7 @@
         :args (s/cat :a #(instance? Element %) :b #(instance? Element %)))
 (defn reach?
   [a b]
-  (->> (filter #(or (= a %) (= % b)) (.getAllElements a)) empty? not))
+  (->> (filter #(= % b) (.getAllElements a)) empty? not))
 
 
 (s/fdef find-nodes-in-page
@@ -222,8 +222,13 @@
                                          attr-nodes)))) 
                (vals attributed-nodes-in-pages))))
 
-#_(defn find-container-node
-  [a b] )
+(defn find-container-node
+  [node-attrs all-attrs] 
+  #_(reduce (fn [acc e] 
+              (if  (reach? acc e)  ) ) 
+            (filter (fn [[node attrs]] (= all-attrs attrs))
+                    node))
+  nil)
 
 (s/fdef find-container
         :args (s/cat :reachable-attr-nodes
