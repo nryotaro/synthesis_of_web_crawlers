@@ -148,6 +148,7 @@
 (s/fdef reach?
         :args (s/cat :a #(instance? Element %) :b #(instance? Element %)))
 (defn reach?
+  "returns true iff b is reachable from a"
   [a b]
   (->> (filter #(= % b) (.getAllElements a)) empty? not))
 
@@ -224,11 +225,11 @@
 
 (defn find-container-node
   [node-attrs all-attrs] 
-  #_(reduce (fn [acc e] 
-              (if  (reach? acc e)  ) ) 
-            (filter (fn [[node attrs]] (= all-attrs attrs))
-                    node))
-  nil)
+  (reduce (fn [acc e] 
+            (if (reach? acc e) e) acc) 
+          (keys (into {}
+                      (filter (fn [[node attrs]] (= all-attrs attrs))
+                              node-attrs)))))
 
 (s/fdef find-container
         :args (s/cat :reachable-attr-nodes
