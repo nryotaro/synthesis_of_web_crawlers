@@ -222,8 +222,6 @@
                                          attr-nodes)))) 
                (vals attributed-nodes-in-pages))))
 
-#_(let [best-attr-set (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))]
-    best-attr-set)
 
 (s/fdef synthesis
         :args (s/cat :attributes 
