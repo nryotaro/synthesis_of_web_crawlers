@@ -235,18 +235,13 @@
         :args (s/cat :reachable-attr-nodes
                      (s/map-of string? (s/map-of #(instance? Element %)
                                                  (s/coll-of keyword?)))
-                     :url-node
+                     :url-attrs
                      (s/map-of string? (s/coll-of keyword?))))
 (defn find-container
-  [reachable-attr-nodes url-node]
-  #_(for [url (keys url-node)]
-    (reduce (fn [container-cand url] 
-              (let [best-attrs (url-node url)
-                    node-attrs (reachable-attr-nodes url)]
-                )
-              ) 
-            url)
-    )nil)
+  [reachable-attr-nodes url-attrs]
+  (into {}
+        (map #(identity [% (find-container-node (reachable-attr-nodes %) (url-attrs %))]) 
+             (keys url-attrs))))
 
 
 (s/fdef synthesis
