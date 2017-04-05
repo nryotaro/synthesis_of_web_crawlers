@@ -24,10 +24,9 @@
 (s/def ::text string?)
 (s/def ::complete-extractor (s/map-of ::container-extractor
                                       ::complete-attr-extractor))
-
-(defn- peek 
-  ([title value] (do (println title ": " value) value))
-  ([value] (do (println value) value)))
+(s/def ::attributed-nodes-in-pages (s/map-of string? 
+                                             (s/map-of keyword? 
+                                                       (s/coll-of #(instance? Element %)))))
 
 (s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
@@ -210,6 +209,18 @@
             {}
             result)))
 
+(s/fdef find-best-attr-set
+        :args (s/cat :attributed-nodes-in-pages ::attributed-nodes-in-pages))
+(defn find-best-attr-set
+  [attributed-nodes-in-pages]
+  (zipmap (keys attributed-nodes-in-pages)
+          (map (fn [attr-nodes] 
+                 (set (filter some? (map (fn [[attr nodes]] 
+                                           (when (seq nodes)
+                                             attr)) 
+                                         attr-nodes)))) 
+               (vals attributed-nodes-in-pages))))
+
 #_(let [best-attr-set (keys (filter (fn [[attr nodes]] (not-empty nodes)) attr-nodes))]
     best-attr-set)
 
@@ -218,7 +229,7 @@
                      ::attributes 
                      :sites ::sites 
                      :site-extractors ::site-extractor))
-#_(defn synthesis
+(defn synthesis
   [attributes sites site-extractors]
   (loop [attr-knowledge {}
          s-extractors site-extractors
@@ -228,14 +239,15 @@
                                     (extract-knowledge sites s-extractors crawled-extractors))]
       ;; new-knowledge ::attr-knowledge
       (for [[site container-extractor] (filter (fn [[site container-extractor]]
-                                                     (incomplete-extractors? container-extractor)) 
-                                         s-extractors)]
+                                                 (incomplete-extractors? container-extractor)) 
+                                               s-extractors)]
         (let [nodes-in-pages (find-nodes-in-page (:pages (sites site)) new-knowledge)
-              ;container-nodes (find-container-nodes (:pages (sites site))nodes-in-pages)
+              reachable-attrs (find-reachable-attrs nodes-in-pages)
+              support-nodes (find-support-nodes nodes-in-pages)
+              find-support-nodes nodes-in-pages
               ]
-          (for [[url page-text] (:pages (sites site))]
-            (do
-              (peek "url " url)
-              (peek "page-text   " page-text)
-              1)))))))
+          (println nodes-in-pages)
+          ;(println reachable-attrs)
+          ;(println support-nodes)
+          )))))
 

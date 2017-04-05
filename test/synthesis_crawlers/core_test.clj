@@ -177,6 +177,18 @@
     (let [elem (first (.select (Jsoup/parse "<html><body><div></div></body></html>") "html > body > div"))]
       (is (= (count (reachable-elements elem)) 3)))))
 
+(deftest find-best-attr-set-test
+  (testing "returns attributes found in pages"
+    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
+          inner-div (first (.select text "html > body > div > div")) 
+          html (first (.select text "html")) 
+          body (first (.select text "html > body")) 
+          span (first (.select text "html > body > div > span")) 
+          outer-div (first (.select text "html > body > div"))
+          result (find-best-attr-set
+                   {"http://foo.com" {:title [inner-div] :date [span] :body []}})]
+      (is (= result
+             {"http://foo.com" #{:title :date}})))))
 
 #_(deftest a-test
     (testing ""
