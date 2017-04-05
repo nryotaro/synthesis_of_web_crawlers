@@ -222,6 +222,26 @@
                                          attr-nodes)))) 
                (vals attributed-nodes-in-pages))))
 
+#_(defn find-container-node
+  [a b] )
+
+(s/fdef find-container
+        :args (s/cat :reachable-attr-nodes
+                     (s/map-of string? (s/map-of #(instance? Element %)
+                                                 (s/coll-of keyword?)))
+                     :url-node
+                     (s/map-of string? (s/coll-of keyword?))))
+(defn find-container
+  [reachable-attr-nodes url-node]
+  #_(for [url (keys url-node)]
+    (reduce (fn [container-cand url] 
+              (let [best-attrs (url-node url)
+                    node-attrs (reachable-attr-nodes url)]
+                )
+              ) 
+            url)
+    )nil)
+
 
 (s/fdef synthesis
         :args (s/cat :attributes 
