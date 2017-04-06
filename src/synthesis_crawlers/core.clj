@@ -176,9 +176,7 @@
   (conj (into [] (.parents elem)) elem))
 
 (s/fdef find-reachable-attrs
-        :args (s/cat :attr-nodes (s/map-of string? 
-                                           (s/map-of keyword? 
-                                                     (s/coll-of #(instance? Element %))))))
+        :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
 (defn find-reachable-attrs 
   [attr-nodes] 
   (let [result (for [[url attr-nodes] attr-nodes
@@ -192,11 +190,8 @@
             {} 
             result)))
 
-(s/fdef find-reachable-attrs
-        :args (s/cat :attr-nodes (s/map-of string? 
-                                           (s/map-of keyword? 
-                                                     (s/coll-of #(instance? Element %))))))
-
+(s/fdef find-support-nodes
+        :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
 (defn find-support-nodes
   [url-attr-nodes]
   (let [result (for [[url attr-nodes] url-attr-nodes
