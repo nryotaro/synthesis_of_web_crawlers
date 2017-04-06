@@ -172,7 +172,14 @@
                                 outer-div #{inner-div span}
                                 html #{inner-div span}
                                 body #{inner-div span}
-                                span #{span}}})))))
+                                span #{span}}}))
+      (is (= (count-support-nodes result) 
+             {"http://foo.com" {inner-div 1
+                                outer-div 2
+                                html 2
+                                body 2
+                                span 1}}))
+      )))
 
 (deftest reachable-elements-test
   (testing "return reachable elements"

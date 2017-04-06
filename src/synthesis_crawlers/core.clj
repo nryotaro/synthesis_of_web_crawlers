@@ -205,6 +205,17 @@
             {}
             result)))
 
+(s/fdef count-support-nodes
+       :args (s/cat :support-nodes (s/map-of string? (s/map-of #(instance? Element %)
+                                                               (s/coll-of #(instance? Element %)
+)
+                                                               ))))
+(defn count-support-nodes
+  [support-nodes]
+  (into {} (for [[url node-nodes] support-nodes]
+             [url (into {}  (for [[node nodes] node-nodes]
+                              [node (count nodes)]))])))
+
 (s/fdef find-best-attr-set
         :args (s/cat :attributed-nodes-in-pages ::attributed-nodes-in-pages))
 (defn find-best-attr-set
@@ -265,7 +276,7 @@
               support-nodes (find-support-nodes nodes-in-pages)
               container-cand-nodes (find-container reachable-attrs 
                                                    (find-best-attr-set reachable-attrs))
-              container-cand-exprs (generate-container-cand-exprs 
+              container-cand-exprs nil #_(generate-container-cand-exprs 
                                      container-cand-nodes support-nodes)
               ]
           (println nodes-in-pages)
