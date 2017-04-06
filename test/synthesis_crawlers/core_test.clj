@@ -226,10 +226,10 @@
                {"http://foo.com" #{:title :date}})
              {"http://foo.com" #{outer-div}})))))
 
-#_(deftest create-relative-path-test
+(deftest create-relative-path-test
   (testing "returns a css selector which specifies e"
-    (let []
-      (is (= (create-relative-path "" ) nil)))))
+    (let [node (first (Jsoup/parse "<html><body><div><span id=\"sp\"></span></div></html>"))]
+      (is (= (create-relative-path "" node) "to be implemented")))))
 
 
 

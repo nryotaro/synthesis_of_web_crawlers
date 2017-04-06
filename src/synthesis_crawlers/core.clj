@@ -257,6 +257,8 @@
         (map #(identity [% (find-container-node (reachable-attr-nodes %) (url-attrs %))]) 
              (keys url-attrs))))
 
+(defn create-relative-path
+  ([prefix node] nil))
 
 (s/fdef generate-container-cand-exprs
         :args (s/cat :container-cand-nodes (s/map-of string? (s/coll-of element?))
@@ -269,6 +271,8 @@
         {:expr (create-relative-path "" cand) :support ((support-node-num url) cand)}) 
       set 
       vec))
+
+
 
 
 (s/fdef synthesis
