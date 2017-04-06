@@ -276,7 +276,7 @@
               support-nodes (find-support-nodes nodes-in-pages)
               container-cand-nodes (find-container reachable-attrs 
                                                    (find-best-attr-set reachable-attrs))
-              container-cand-exprs nil #_(generate-container-cand-exprs 
+              container-cand-exprs (generate-container-cand-exprs 
                                      container-cand-nodes support-nodes)
               ]
           (println nodes-in-pages)
