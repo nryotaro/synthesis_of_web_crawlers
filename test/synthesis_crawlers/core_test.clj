@@ -226,6 +226,13 @@
                {"http://foo.com" #{:title :date}})
              {"http://foo.com" #{outer-div}})))))
 
+#_(deftest create-relative-path-test
+  (testing "returns a css selector which specifies e"
+    (let []
+      (is (= (create-relative-path "" ) nil)))))
+
+
+
 (deftest generate-container-cand-exprs-test
   (testing "generates the expressions of the specified containers"
     (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
@@ -241,7 +248,8 @@
                                   html 2
                                   body 2
                                   span 1}})
-             nil)))))
+             [{:expr "html > body > div" 
+               :support 2}])))))
 
 #_(deftest a-test
     (testing ""
