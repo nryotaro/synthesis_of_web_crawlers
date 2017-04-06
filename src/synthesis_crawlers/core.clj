@@ -263,7 +263,7 @@
         (let [nodes-in-pages (find-nodes-in-page (:pages (sites site)) new-knowledge)
               reachable-attrs (find-reachable-attrs nodes-in-pages)
               support-nodes (find-support-nodes nodes-in-pages)
-              find-support-nodes nodes-in-pages
+              container-cand-nodes (find-container-node )
               ]
           (println nodes-in-pages)
           ;(println reachable-attrs)

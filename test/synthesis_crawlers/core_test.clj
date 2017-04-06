@@ -210,14 +210,14 @@
                 span #{:date}}
                #{:title :date})
              #{outer-div}))
-      #_(is (= (find-container 
+      (is (= (find-container 
                {"http://foo.com" {inner-div #{:title}
                                   outer-div #{:date :title}
                                   html #{:date :title}
                                   body #{:date :title}
                                   span #{:date}}}
                {"http://foo.com" #{:title :date}})
-             {"http://foo.com" outer-div})))))
+             {"http://foo.com" #{outer-div}})))))
 
 #_(deftest a-test
     (testing ""
