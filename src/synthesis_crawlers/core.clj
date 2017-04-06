@@ -9,6 +9,10 @@
            (org.jsoup.nodes Element)
            (info.debatty.java.stringsimilarity Jaccard)))
 
+(defn element?
+  [e]
+  #(instance? Element e))
+
 (s/def ::attribute keyword?)
 (s/def ::attributes (s/coll-of ::attribute))
 (s/def ::url-pattern #(instance? java.util.regex.Pattern %))
@@ -252,6 +256,19 @@
   (into {}
         (map #(identity [% (find-container-node (reachable-attr-nodes %) (url-attrs %))]) 
              (keys url-attrs))))
+
+
+(s/fdef generate-container-cand-exprs
+        :args (s/cat :container-cand-nodes (s/map-of string? (s/coll-of element?))
+                     :support-node-num (s/map-of string? (s/map-of element? pos-int?))))
+(defn generate-container-cand-exprs
+  [container-cand-nodes support-node-num]
+  (-> (for [[url container-cands] container-cand-nodes
+            cand container-cands]
+        ;; TO be implemented
+        {:expr (create-relative-path "" cand) :support ((support-node-num url) cand)}) 
+      set 
+      vec))
 
 
 (s/fdef synthesis
