@@ -300,15 +300,19 @@
       set 
       vec))
 
+(s/fdef parse-css-clause :args (s/cat :clause string?))
+(defn parse-css-clause
+  [clause] 
+  (let [tag (re-seq #"^[^#\.]+" clause)
+        classes (re-seq #"\.([^\.]+)" clause)
+        id (re-seq  #"#([^\.\s]+)" clause)]
+    (hash-map :tag (if (seq tag) (first tag) "")
+              :id (if (seq id) (->> id first second) "")
+              :class (if (seq classes) (set (map second classes)) #{}))))
+
 (defn parse-css-selector
   [selector]
-  (map #(let [tag (re-seq #"^[#\.]+" %)
-              classes (re-seq #"\.([^\.]+)" %)
-              id (re-seq  #"#[^\.\s]+" %)]
-          (hash-map :tag (if (seq tag) (first tag) "")
-                    :id (if (seq id) (first id) "")
-                    :class (if (seq classes) (set (map second classes)) "")
-                    )) 
+  (map #(parse-css-clause %) 
        (split selector #"\s+>\s+")))
 
 (s/fdef unify-exprs
