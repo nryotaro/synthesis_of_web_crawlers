@@ -289,11 +289,30 @@
   (testing "returns true iff a satisfies with b"
     (let [t1 (parse-css-selector "html > body > div#id")
           t2 (parse-css-selector "html > body > div")]
+      (is (= (agree? t1 [])
+             true))
       (is (= (agree? t1 t2)
              true))
       )
     (is (= (agree? [] [])
            true))))
+
+
+(deftest sort-instructions-test
+  (testing "sorts the specified instructions"
+    (is (< (compare-instruction {:tag "html" :class #{} :id "#id"}
+                                {:tag "html" :class #{} :id ""})
+           0))
+    (is (> (compare-instruction {:tag "html" :class #{} :id "#id"}
+                                {:tag "html" :class #{"a"} :id "a"})
+           0))
+    (is (> (compare-instruction {:tag "html" :class #{} :id "#id"}
+                                {:tag "html" :class #{"a"} :id "a"})
+           0))
+    (is (> (compare-instruction {:tag "html" :class #{"a"} :id "a"}
+                                {:tag "html" :class #{"a" "b"} :id "id"})
+           0))
+    ))
 
 
 (deftest unify-test
