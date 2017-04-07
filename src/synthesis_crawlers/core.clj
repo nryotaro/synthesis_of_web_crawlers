@@ -1,7 +1,7 @@
 (ns synthesis-crawlers.core
   (:require [clojure.spec :as s]
             [synthesis-crawlers.page :as page]
-            [clojure.string :refer [starts-with? ends-with?]]
+            [clojure.string :refer [starts-with? ends-with? join]]
             [org.httpkit.client :as http]
             [clojure.data :refer [diff]])
   (:import (org.jsoup Jsoup)
@@ -268,12 +268,17 @@
             [] 
             (into [node] (.parents node)))))
 
-#_(s/fdef decode-node-path
+(s/fdef decode-node-path
         :args (s/cat :encoded-node
-                     (s/coll-of (s/keys :req [:tag :class :id]))))
+                     (s/coll-of (s/keys :req-un [::tag ::class ::id]))))
 (defn decode-node-path
   [encoded-node]
-  nil)
+  (join " > " (map (fn [{:keys [tag class id]}]
+                     (str tag 
+                          (when (seq id) (str "#" id))
+                          (when (seq class)
+                            (str "." (join "." (sort (vec class)))))))
+                   encoded-node)))
 
 (defn create-relative-path
   ([prefix node] 
