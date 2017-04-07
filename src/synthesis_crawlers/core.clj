@@ -327,16 +327,33 @@
 (defn agree?
   "returns true iff a satisfies with b"
   [a b]
-  (if (> (count a) (count b)) 
+  (if (< (count a) (count b)) 
     false
     (reduce 
       #(if %1 %2 false)
       true
-      (map (fn [{atag :tag aclass :class aid :id} {btag :tag bclass :class bid :id}]
+      (map (fn [{atag :tag aclass :class aid :id} 
+                {btag :tag bclass :class bid :id}]
              (and (or (nil? (seq bid)) (= aid bid))
                   (or (nil? (seq btag)) (= atag btag))
                   (nil? (second (diff aclass bclass))))) 
            a b))))
+
+(s/fdef compare-instruction
+        :args (s/cat :a-inst ::expr :b-inst ::expr))
+(defn compare-instruction
+  [a-inst b-inst]
+  (letfn [(full-filled? [{:keys [tag class id]}] 
+            (and (seq tag) (seq class) (seq id)))]
+    (cond 
+      (agree? [a-inst] [b-inst]) -1
+      (agree? [b-inst] [a-inst]) 1
+      (and (full-filled? a-inst) (full-filled? b-inst)) (- (count (:class b-inst)) 
+                                                           (count (:class a-inst)))
+      (and (seq (:id a-inst)) (not (seq (:id b-inst)))) -1
+      (and (seq (:id b-inst)) (not (seq (:id a-inst)))) 1
+      :else (- (+ (if (seq (:tag b-inst)) 1 0) (count (:class b-inst)))
+               (+ (if (seq (:tag a-inst)) 1 0) (count (:class a-inst)))))))
 
 (s/fdef unify-exprs
         :args (s/cat :exprs-with-supports (s/coll-of 
@@ -354,10 +371,15 @@
     (loop [iter 0
            still-agreed exprs-with-supports
            agreed-path []]
-      (if (> iter longest)
+      (if (>= iter longest)
         agreed-path
-        (let [agreed (filter #(agree? (:expr %) agreed-path) still-agreed)]
-          agreed)
+        (let [agreed (filter #(agree? (:expr %) agreed-path) still-agreed)
+              instructions (map #(nth (:expr %) iter) agreed)
+              ]
+          (if-not (seq? instructions)
+            agreed-path
+            (str "to be implemented" ":" (println instructions))
+            ))
         ))))
 
 (s/fdef synthesis
