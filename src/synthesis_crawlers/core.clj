@@ -282,7 +282,10 @@
 
 (defn create-relative-path
   ([prefix node] 
-   nil)
+   (let [path (decode-node-path (encode-node-path node))]
+     (if (seq prefix)
+       (str prefix " > " path)
+       path)))
   ([node] (create-relative-path "" node)))
 
 (s/fdef generate-container-cand-exprs
@@ -292,13 +295,9 @@
   [container-cand-nodes support-node-num]
   (-> (for [[url container-cands] container-cand-nodes
             cand container-cands]
-        ;; TO be implemented
         {:expr (create-relative-path "" cand) :support ((support-node-num url) cand)}) 
       set 
       vec))
-
-
-
 
 (s/fdef synthesis
         :args (s/cat :attributes 
@@ -326,7 +325,5 @@
                                      container-cand-nodes support-nodes)
               ]
           (println nodes-in-pages)
-          ;(println reachable-attrs)
-          ;(println support-nodes)
           )))))
 
