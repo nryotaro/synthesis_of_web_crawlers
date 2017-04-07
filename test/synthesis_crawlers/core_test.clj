@@ -276,6 +276,8 @@
 
 (deftest parse-css-selctor-test
   (testing "parses the specified css selector"
+    (is (= (parse-css-clause "html") {:tag "html" :class #{} :id ""}))
+    (is (= (parse-css-clause "div#bar.hoge.piyo") {:tag "div" :class #{"hoge" "piyo"} :id "bar"}))
     (is (=  (parse-css-selector
               "html > body > div#bar.hoge.piyo > span#sp")
            [{:tag "html", :class #{}, :id ""} 
