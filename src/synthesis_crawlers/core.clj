@@ -257,8 +257,21 @@
         (map #(identity [% (find-container-node (reachable-attr-nodes %) (url-attrs %))]) 
              (keys url-attrs))))
 
+
+(s/fdef encode-node-path
+        :args (s/cat :node element?))
+(defn encode-node-path
+  [node]
+  (reverse 
+    (reduce (fn [acc node]
+              (conj acc {:tag (.tagName node) :class (.classNames node) :id (.id node)})) 
+            [] 
+            (into [node] (.parents node)))))
+
 (defn create-relative-path
-  ([prefix node] nil))
+  ([prefix node] 
+   nil)
+  ([node] (create-relative-path "" node)))
 
 (s/fdef generate-container-cand-exprs
         :args (s/cat :container-cand-nodes (s/map-of string? (s/coll-of element?))

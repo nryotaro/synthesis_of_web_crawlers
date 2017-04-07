@@ -226,10 +226,19 @@
                {"http://foo.com" #{:title :date}})
              {"http://foo.com" #{outer-div}})))))
 
+
+(deftest encode-node-path-test
+  (testing "builds node path"
+    (let [node (first 
+                 (.select 
+                   (Jsoup/parse 
+                     "<html><body><div class=\"hoge\"><span id=\"sp\"></span></div></html>") "html > body > div > span#sp"))]
+      (is (= (encode-node-path node)
+             [{:tag "html", :class #{}, :id ""} {:tag "body", :class #{}, :id ""} {:tag "div", :class #{"hoge"}, :id ""} {:tag "span", :class #{}, :id "sp"}])))))
 (deftest create-relative-path-test
   (testing "returns a css selector which specifies e"
-    (let [node (first (Jsoup/parse "<html><body><div><span id=\"sp\"></span></div></html>"))]
-      (is (= (create-relative-path "" node) "to be implemented")))))
+    (let [node (first (.select (Jsoup/parse "<html><body><div class=\"hoge\"><span id=\"sp\"></span></div></html>") "html > body > div > span#sp"))]
+      (is (= (create-relative-path node) "to be implemented")))))
 
 
 
