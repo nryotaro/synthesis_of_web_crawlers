@@ -285,9 +285,24 @@
             {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
             {:tag "span", :class #{}, :id "sp"}]))))
 
+(deftest agree?-test
+  (testing "returns true iff a satisfies with b"
+    (let [t1 (parse-css-selector "html > body > div#id")
+          t2 (parse-css-selector "html > body > div")]
+      (is (= (agree? t1 t2)
+             true))
+      )
+    (is (= (agree? [] [])
+           true))))
+
+
 (deftest unify-test
   (testing "unify exprs"
-    (is (= (unify-exprs [{:expr "html > body > div > span" :support 1}]
+    (is (= (unify-exprs [{:expr [{:tag "html", :class #{}, :id ""} 
+                                 {:tag "body", :class #{}, :id ""} 
+                                 {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
+                                 {:tag "span", :class #{}, :id "sp"}]
+                          :support 1}]
                         0.6)
            "to be implemented"))))
 

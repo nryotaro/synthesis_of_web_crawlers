@@ -31,6 +31,11 @@
 (s/def ::attributed-nodes-in-pages (s/map-of string? 
                                              (s/map-of keyword? 
                                                        (s/coll-of #(instance? Element %)))))
+(s/def ::tag string?)
+(s/def ::class (s/coll-of string?))
+(s/def ::id string?)
+(s/def ::support double?)
+(s/def ::expr (s/keys :req-un [::tag ::class ::id]))
 
 (s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
@@ -264,13 +269,13 @@
   [node]
   (reverse 
     (reduce (fn [acc node]
-              (conj acc {:tag (.tagName node) :class (.classNames node) :id (.id node)})) 
+              (conj acc {:tag (.tagName node) :class (set (.classNames node)) :id (.id node)})) 
             [] 
             (into [node] (.parents node)))))
 
 (s/fdef decode-node-path
         :args (s/cat :encoded-node
-                     (s/coll-of (s/keys :req-un [::tag ::class ::id]))))
+                     (s/coll-of ::expr)))
 (defn decode-node-path
   [encoded-node]
   (join " > " (map (fn [{:keys [tag class id]}]
@@ -315,17 +320,45 @@
   (map #(parse-css-clause %) 
        (split selector #"\s+>\s+")))
 
+
+(s/fdef agree?
+        :args (s/cat :a (s/coll-of ::expr)
+                     :b (s/coll-of ::expr)))
+(defn agree?
+  "returns true iff a satisfies with b"
+  [a b]
+  (if (> (count a) (count b)) 
+    false
+    (reduce 
+      #(if %1 %2 false)
+      true
+      (map (fn [{atag :tag aclass :class aid :id} {btag :tag bclass :class bid :id}]
+             (and (or (nil? (seq bid)) (= aid bid))
+                  (or (nil? (seq btag)) (= atag btag))
+                  (nil? (second (diff aclass bclass))))) 
+           a b))))
+
 (s/fdef unify-exprs
-        :args (s/cat :exprs-with-supports
-                     (s/coll-of (fn [{:keys [expr support]}]
-                                  (and (string? expr) (pos-int? support))))
+        :args (s/cat :exprs-with-supports (s/coll-of 
+                                            (fn [{:keys [expr support]}]
+                                              (and (int? support)
+                                                   (s/coll-of ::expr))))
                      :threshold double?))
 (defn unify-exprs
   [exprs-with-supports threshold]
   (let [total-support (apply + (map (fn [{:keys [expr support]}] support) 
-                                    exprs-with-supports))]
-    (println total-support))
-  nil)
+                                    exprs-with-supports))
+        longest  (apply max 
+                           (map (fn [{:keys [expr]}](count expr)) 
+                                exprs-with-supports))]
+    (loop [iter 0
+           still-agreed exprs-with-supports
+           agreed-path []]
+      (if (> iter longest)
+        agreed-path
+        (let [agreed (filter #(agree? (:expr %) agreed-path) still-agreed)]
+          agreed)
+        ))))
 
 (s/fdef synthesis
         :args (s/cat :attributes 
