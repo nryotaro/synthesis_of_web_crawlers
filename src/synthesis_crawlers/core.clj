@@ -1,7 +1,7 @@
 (ns synthesis-crawlers.core
   (:require [clojure.spec :as s]
             [synthesis-crawlers.page :as page]
-            [clojure.string :refer [starts-with? ends-with? join]]
+            [clojure.string :refer [starts-with? ends-with? join split]]
             [org.httpkit.client :as http]
             [clojure.data :refer [diff]])
   (:import (org.jsoup Jsoup)
@@ -295,9 +295,33 @@
   [container-cand-nodes support-node-num]
   (-> (for [[url container-cands] container-cand-nodes
             cand container-cands]
-        {:expr (create-relative-path "" cand) :support ((support-node-num url) cand)}) 
+        {:expr (create-relative-path "" cand) 
+         :support ((support-node-num url) cand)}) 
       set 
       vec))
+
+(defn parse-css-selector
+  [selector]
+  (map #(let [tag (re-seq #"^[#\.]+" %)
+              classes (re-seq #"\.([^\.]+)" %)
+              id (re-seq  #"#[^\.\s]+" %)]
+          (hash-map :tag (if (seq tag) (first tag) "")
+                    :id (if (seq id) (first id) "")
+                    :class (if (seq classes) (set (map second classes)) "")
+                    )) 
+       (split selector #"\s+>\s+")))
+
+(s/fdef unify-exprs
+        :args (s/cat :exprs-with-supports
+                     (s/coll-of (fn [{:keys [expr support]}]
+                                  (and (string? expr) (pos-int? support))))
+                     :threshold double?))
+(defn unify-exprs
+  [exprs-with-supports threshold]
+  (let [total-support (apply + (map (fn [{:keys [expr support]}] support) 
+                                    exprs-with-supports))]
+    (println total-support))
+  nil)
 
 (s/fdef synthesis
         :args (s/cat :attributes 

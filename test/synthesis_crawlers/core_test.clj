@@ -274,10 +274,25 @@
              [{:expr "html > body > div" 
                :support 2}])))))
 
+(deftest parse-css-selctor-test
+  (testing "parses the specified css selector"
+    (is (=  (parse-css-selector
+              "html > body > div#bar.hoge.piyo > span#sp")
+           [{:tag "html", :class #{}, :id ""} 
+            {:tag "body", :class #{}, :id ""} 
+            {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
+            {:tag "span", :class #{}, :id "sp"}]))))
+
+(deftest unify-test
+  (testing "unify exprs"
+    (is (= (unify-exprs [{:expr "html > body > div > span" :support 1}]
+                        0.6)
+           "to be implemented"))))
+
 #_(deftest a-test
     (testing ""
       (is (= nil 
-             nil))))
+             "to be implemented"))))
 
 #_(deftest synthesis-test
   (testing "tests synthesis"
