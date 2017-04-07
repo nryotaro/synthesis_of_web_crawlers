@@ -234,7 +234,21 @@
                    (Jsoup/parse 
                      "<html><body><div class=\"hoge\"><span id=\"sp\"></span></div></html>") "html > body > div > span#sp"))]
       (is (= (encode-node-path node)
-             [{:tag "html", :class #{}, :id ""} {:tag "body", :class #{}, :id ""} {:tag "div", :class #{"hoge"}, :id ""} {:tag "span", :class #{}, :id "sp"}])))))
+             [{:tag "html", :class #{}, :id ""} 
+              {:tag "body", :class #{}, :id ""} 
+              {:tag "div", :class #{"hoge"}, :id ""} 
+              {:tag "span", :class #{}, :id "sp"}])))))
+
+(deftest decode-node-path-test
+  (testing "decodes node path"
+    (is (= (decode-node-path [{:tag "html", :class #{}, :id ""} 
+                              {:tag "body", :class #{}, :id ""} 
+                              {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
+                              {:tag "span", :class #{}, :id "sp"}])
+           "html > body > div#bar.hoge.piyo > span#sp"))))
+
+
+
 (deftest create-relative-path-test
   (testing "returns a css selector which specifies e"
     (let [node (first (.select (Jsoup/parse "<html><body><div class=\"hoge\"><span id=\"sp\"></span></div></html>") "html > body > div > span#sp"))]

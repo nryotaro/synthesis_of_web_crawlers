@@ -268,6 +268,13 @@
             [] 
             (into [node] (.parents node)))))
 
+#_(s/fdef decode-node-path
+        :args (s/cat :encoded-node
+                     (s/coll-of (s/keys :req [:tag :class :id]))))
+(defn decode-node-path
+  [encoded-node]
+  nil)
+
 (defn create-relative-path
   ([prefix node] 
    nil)
