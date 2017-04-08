@@ -75,7 +75,6 @@
      (empty? container-expr) attr-expr
      :else (str container-expr " > " attr-expr))})
 
-
 ;; If container is empty, it is interpreted as a node descriptor that extracts the root of the page. 
 ;; If container is empty and f is undefined for every attribute, we say that the data extractor is empty.
 (s/fdef drop-undef-attr-extractors
@@ -121,7 +120,6 @@
                         text (vals (:pages (sites site)))] 
                     (extract text extractor))]
     (apply (partial merge-with into) extracted)))
-
 
 (s/fdef empty-extractor?
         :args (s/cat :extractor (s/map-of ::container-extractor 
@@ -358,8 +356,9 @@
 (s/fdef unify-exprs
         :args (s/cat :exprs-with-supports (s/coll-of 
                                             (fn [{:keys [expr support]}]
-                                              (and (int? support)
-                                                   (s/coll-of ::expr))))
+                                              (and (int? support) ;; FIXME 
+                                                   (s/valid? 
+                                                     (s/coll-of ::expr) expr))))
                      :threshold double?))
 (defn unify-exprs
   [exprs-with-supports threshold]
@@ -374,11 +373,22 @@
       (if (>= iter longest)
         agreed-path
         (let [agreed (filter #(agree? (:expr %) agreed-path) still-agreed)
-              instructions (map #(nth (:expr %) iter) agreed)
-              ]
+              instructions (map (fn [{:keys [expr support]}]
+                                  (hash-map :inst (nth expr iter)
+                                            :support support)) 
+                                agreed)]
           (if-not (seq? instructions)
             agreed-path
-            (str "to be implemented" ":" (println instructions))
+            (reduce (fn [acc expr] 
+                      (let [score (apply + (map :support 
+                                                (filter (fn [{:keys [inst support]}] 
+                                                          (agree? [inst] [expr]))  
+                                                        instructions)))] 
+                        (if (> score (* threshold * total-support))
+                          :recur
+                          ))) 
+                    nil
+                    (sort compare-instruction (map :inst instructions)))
             ))
         ))))
 
