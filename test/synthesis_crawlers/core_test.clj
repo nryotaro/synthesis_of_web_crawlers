@@ -333,6 +333,19 @@
       (is (= (decode-node-path (unify-exprs {s1 1 s3 1} 0.6))
              "html > body > div.foo")))))
 
+(deftest generate-attr-exprs-test
+  (testing "generates attribute descriptors"
+    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/generate-attr-exprs.html"))
+          inner-div (first (.select text "html > body > div > div")) 
+          span (first (.select text "html > body > div > span")) 
+          html (first (.select text "html")) 
+          body (first (.select text "html > body")) 
+          outer-div (first (.select text "html > body > div"))]
+      (is (= (generate-attr-exprs (parse-css-selector "html > body > div") 
+                                  {"http://foo.com" {:title #{inner-div} :date #{span}}} 
+                                  0.5) 
+             "to be implemented")))))
+
 #_(deftest a-test
     (testing ""
       (is (= nil 
