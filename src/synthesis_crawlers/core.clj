@@ -240,12 +240,8 @@
                      :all-attrs ::attributes))
 (defn find-container-node
   [node-attrs all-attrs] 
-  (println "node-attrs: " node-attrs)
-  (println "all-attrs " all-attrs)
   (set 
     (reduce (fn [acc e] 
-              (println "find-container-node " (type acc) ": " acc )
-              (println "find-container-node"(type e) ": " e )
               (let [removed (remove #(reach? % e) acc)]
                 (if-not (seq removed)
                   (conj (filter #(not (reach? % e)) acc) e)
@@ -430,13 +426,12 @@
                                                s-extractors)]
         (let [nodes-in-pages (find-nodes-in-page (:pages (sites site)) new-knowledge)
               reachable-attrs (find-reachable-attrs nodes-in-pages)
-              support-nodes (find-support-nodes nodes-in-pages)
+              support-nodes (count-support-nodes (find-support-nodes nodes-in-pages))
               container-cand-nodes (find-container reachable-attrs 
                                                    (find-best-attr-set 
                                                      nodes-in-pages))
               container-cand-exprs (generate-container-cand-exprs 
-                                     container-cand-nodes support-nodes)
-              ]
+                                     container-cand-nodes support-nodes)]
           (println "!!!" container-cand-exprs)
           )))))
 
