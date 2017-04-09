@@ -405,6 +405,16 @@
                      agreed 
                      (if inst (conj agreed-path inst) agreed-path)))))))))
 
+(s/fdef generate-attr-exprs
+  :args (s/cat :container-descriptions (s/coll-of ::expr)
+               :nodes-in-pages ::attributed-nodes-in-pages
+               :threshold double?))
+(defn generate-attr-exprs
+  [container-descriptions nodes-in-pages threshold]
+  (for [attr (flatten (map keys (vals nodes-in-pages)))
+        node (flatten (map #(vec (% attr)) (vals nodes-in-pages)))]
+    [attr (create-relative-path node)]
+    ))
 
 (s/fdef synthesis
         :args (s/cat :attributes 
