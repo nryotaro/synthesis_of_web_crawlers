@@ -394,11 +394,15 @@
               instructions (apply (partial merge-with +)
                                   (map (fn [[path support]]
                                          (hash-map (nth path iter) support))
-                                       agreed))]
+                                       (filter (fn [[k _]](> (count k) iter))
+                                               agreed)
+                                       ))]
           (if (empty? instructions)
             agreed-path
             (let [inst (select-uni-inst instructions threshold total-support)]
-              (recur (inc iter) agreed (conj agreed-path inst)))))))))
+              (recur (inc iter) 
+                     agreed 
+                     (if inst (conj agreed-path inst) agreed-path)))))))))
 
 (s/fdef synthesis
         :args (s/cat :attributes 

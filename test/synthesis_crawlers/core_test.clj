@@ -326,16 +326,20 @@
 (deftest unify-test
   (testing "unify exprs"
     (let [s1 (parse-css-selector "html > body > div.foo > div")
-          s2 (parse-css-selector "html > body > div.foo > div.piyo")]
+          s2 (parse-css-selector "html > body > div.foo > div.piyo")
+          s3 (parse-css-selector "html > body > div.foo")
+          ]
       (is (= (decode-node-path (unify-exprs {s1 2 s2 1} 0.6))
-             "html > body > div.foo > div")))))
+             "html > body > div.foo > div"))
+      (is (= (decode-node-path (unify-exprs {s1 1 s3 1} 0.6))
+             "html > body > div.foo")))))
 
 #_(deftest a-test
     (testing ""
       (is (= nil 
              "to be implemented"))))
 
-#_(deftest synthesis-test
+(deftest synthesis-test
   (testing "tests synthesis"
     (is (= (synthesis #{:title} 
                       {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" 
