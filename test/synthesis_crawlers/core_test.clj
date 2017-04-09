@@ -325,13 +325,10 @@
 
 (deftest unify-test
   (testing "unify exprs"
-    (is (= (unify-exprs {[{:tag "html", :class #{}, :id ""} 
-                          {:tag "body", :class #{}, :id ""} 
-                          {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
-                          {:tag "span", :class #{}, :id "sp"}]
-                         1}
-                        0.5)
-           "to be implemented"))))
+    (let [s1 (parse-css-selector "html > body > div.foo > div")
+          s2 (parse-css-selector "html > body > div.foo > div.piyo")]
+      (is (= (decode-node-path (unify-exprs {s1 2 s2 1} 0.6))
+             "html > body > div.foo > div")))))
 
 #_(deftest a-test
     (testing ""
