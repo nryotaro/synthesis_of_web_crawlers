@@ -425,7 +425,8 @@
               reachable-attrs (find-reachable-attrs nodes-in-pages)
               support-nodes (find-support-nodes nodes-in-pages)
               container-cand-nodes (find-container reachable-attrs 
-                                                   (find-best-attr-set reachable-attrs))
+                                                   (find-best-attr-set 
+                                                     nodes-in-pages))
               container-cand-exprs (generate-container-cand-exprs 
                                      container-cand-nodes support-nodes)
               ]
