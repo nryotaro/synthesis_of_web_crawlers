@@ -405,6 +405,7 @@
                      agreed 
                      (if inst (conj agreed-path inst) agreed-path)))))))))
 
+
 (s/fdef synthesis
         :args (s/cat :attributes 
                      ::attributes 
@@ -434,7 +435,7 @@
               container-expr (unify-exprs 
                                (zipmap (map parse-css-selector (keys container-cand-exprs)) (vals container-cand-exprs))
                                threshold)
-              ]
+              attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
           (println "!!!" container-expr)
           )))))
 
