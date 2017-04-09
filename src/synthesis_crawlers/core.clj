@@ -354,29 +354,25 @@
                (+ (if (seq (:tag a-inst)) 1 0) (count (:class a-inst)))))))
 
 (s/fdef unify-exprs
-        :args (s/cat :exprs-with-supports (s/coll-of 
-                                            (fn [{:keys [expr support]}]
-                                              (and (int? support) ;; FIXME 
-                                                   (s/valid? 
-                                                     (s/coll-of ::expr) expr))))
+        :args (s/cat :exprs-with-supports 
+                     (s/map-of (s/coll-of ::expr) pos-int?)
                      :threshold double?))
 (defn unify-exprs
   [exprs-with-supports threshold]
-  (let [total-support (apply + (map (fn [{:keys [expr support]}] support) 
-                                    exprs-with-supports))
-        longest  (apply max 
-                           (map (fn [{:keys [expr]}](count expr)) 
+  (let [total-support (apply + (vals exprs-with-supports))
+        longest  (apply max (map count (keys exprs-with-supports))
+                           #_(map (fn [{:keys [expr]}](count expr)) 
                                 exprs-with-supports))]
     (loop [iter 0
            still-agreed exprs-with-supports
            agreed-path []]
       (if (>= iter longest)
         agreed-path
-        (let [agreed (filter #(agree? (:expr %) agreed-path) still-agreed)
-              instructions (map (fn [{:keys [expr support]}]
-                                  (hash-map :inst (nth expr iter)
-                                            :support support)) 
-                                agreed)]
+        (let [agreed (filter (fn [[path _]] (agree? path agreed-path)) still-agreed)
+              instructions (apply (partial merge-with +)
+                                  (map (fn [[path support]]
+                                         (hash-map (nth path iter) support))
+                                       agreed))]
           (if-not (seq? instructions)
             agreed-path
             (reduce (fn [acc expr] 
@@ -417,6 +413,6 @@
               container-cand-exprs (generate-container-cand-exprs 
                                      container-cand-nodes support-nodes)
               ]
-          (println nodes-in-pages)
+          (println "!!!" container-cand-exprs)
           )))))
 

@@ -314,14 +314,22 @@
            0))
     ))
 
+(deftest select-uni-inst-test
+  (testing "selects unifiled instruction"
+    (is (= (select-uni-inist
+             {{:tag "div" :class #{} :id ""} 2
+              }
+             0.5
+             4)
+           "to be implemented"))))
 
 (deftest unify-test
   (testing "unify exprs"
-    (is (= (unify-exprs [{:expr [{:tag "html", :class #{}, :id ""} 
-                                 {:tag "body", :class #{}, :id ""} 
-                                 {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
-                                 {:tag "span", :class #{}, :id "sp"}]
-                          :support 1}]
+    (is (= (unify-exprs {[{:tag "html", :class #{}, :id ""} 
+                          {:tag "body", :class #{}, :id ""} 
+                          {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
+                          {:tag "span", :class #{}, :id "sp"}]
+                         1}
                         0.6)
            "to be implemented"))))
 
