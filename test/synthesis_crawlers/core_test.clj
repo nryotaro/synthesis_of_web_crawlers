@@ -271,8 +271,7 @@
                                   html 2
                                   body 2
                                   span 1}})
-             [{:expr "html > body > div" 
-               :support 2}])))))
+             {"html > body > div" 2})))))
 
 (deftest parse-css-selctor-test
   (testing "parses the specified css selector"
@@ -347,5 +346,6 @@
                        "http://www.newsweek.com" {:url-pattern #"^http://www\.newsweek\.com/.+$"
                                                   :pages {"http://www.newsweek.com/1" "<html><body><div>hello world1</div></body></html>"}}}
                       {"http://www.economist.com" {"html > body" {:title "span"}}
-                       "http://www.newsweek.com" {"" {:title nil}}})
+                       "http://www.newsweek.com" {"" {:title nil}}}
+                      0.5)
            nil))))

@@ -299,12 +299,10 @@
                      :support-node-num (s/map-of string? (s/map-of element? pos-int?))))
 (defn generate-container-cand-exprs
   [container-cand-nodes support-node-num]
-  (-> (for [[url container-cands] container-cand-nodes
-            cand container-cands]
-        {:expr (create-relative-path "" cand) 
-         :support ((support-node-num url) cand)}) 
-      set 
-      vec))
+  (into {} 
+        (for [[url container-cands] container-cand-nodes
+              cand container-cands]
+          [(create-relative-path cand) ((support-node-num url) cand)])))
 
 (s/fdef parse-css-clause :args (s/cat :clause string?))
 (defn parse-css-clause
@@ -411,9 +409,10 @@
         :args (s/cat :attributes 
                      ::attributes 
                      :sites ::sites 
-                     :site-extractors ::site-extractor))
+                     :site-extractors ::site-extractor
+                     :threshold double?))
 (defn synthesis
-  [attributes sites site-extractors]
+  [attributes sites site-extractors threshold]
   (loop [attr-knowledge {}
          s-extractors site-extractors
          crawled-extractors {}]
@@ -431,7 +430,11 @@
                                                    (find-best-attr-set 
                                                      nodes-in-pages))
               container-cand-exprs (generate-container-cand-exprs 
-                                     container-cand-nodes support-nodes)]
-          (println "!!!" container-cand-exprs)
+                                     container-cand-nodes support-nodes)
+              container-expr (unify-exprs 
+                               (zipmap (map parse-css-selector (keys container-cand-exprs)) (vals container-cand-exprs))
+                               threshold)
+              ]
+          (println "!!!" container-expr)
           )))))
 
