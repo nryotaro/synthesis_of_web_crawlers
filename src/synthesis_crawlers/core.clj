@@ -382,9 +382,12 @@
         longest  (apply max (map count (keys exprs-with-supports))
                            #_(map (fn [{:keys [expr]}](count expr)) 
                                 exprs-with-supports))]
+    #_(println total-support )
+    #_(println longest)
     (loop [iter 0
            still-agreed exprs-with-supports
            agreed-path []]
+      #_(println "agreed-path: " agreed-path)
       (if (>= iter longest)
         agreed-path
         (let [agreed (filter (fn [[path _]] (agree? path agreed-path)) still-agreed)
@@ -392,7 +395,7 @@
                                   (map (fn [[path support]]
                                          (hash-map (nth path iter) support))
                                        agreed))]
-          (if-not (seq? instructions)
+          (if (empty? instructions)
             agreed-path
             (let [inst (select-uni-inst instructions threshold total-support)]
               (recur (inc iter) agreed (conj agreed-path inst)))))))))
