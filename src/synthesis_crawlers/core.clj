@@ -235,13 +235,20 @@
                                          attr-nodes)))) 
                (vals attributed-nodes-in-pages))))
 
+(s/fdef find-container-node
+        :args (s/cat :node-attrs (s/map-of element? ::attributes)
+                     :all-attrs ::attributes))
 (defn find-container-node
   [node-attrs all-attrs] 
+  (println "node-attrs: " node-attrs)
+  (println "all-attrs " all-attrs)
   (set 
     (reduce (fn [acc e] 
+              (println "find-container-node " (type acc) ": " acc )
+              (println "find-container-node"(type e) ": " e )
               (let [removed (remove #(reach? % e) acc)]
                 (if-not (seq removed)
-                  (conj (filter #(not (reach? %) e) acc) e)
+                  (conj (filter #(not (reach? % e)) acc) e)
                   acc)))
             #{}
             (keys (into {}
