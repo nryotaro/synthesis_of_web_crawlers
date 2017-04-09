@@ -316,12 +316,12 @@
 
 (deftest select-uni-inst-test
   (testing "selects unifiled instruction"
-    (is (= (select-uni-inist
-             {{:tag "div" :class #{} :id ""} 2
-              }
+    (is (= (select-uni-inst
+             {{:tag "div" :class #{} :id ""} 1
+              {:tag "div" :class #{} :id "foo"} 1}
              0.5
-             4)
-           "to be implemented"))))
+             2)
+           {:tag "div" :class #{} :id ""}))))
 
 (deftest unify-test
   (testing "unify exprs"
@@ -330,7 +330,7 @@
                           {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
                           {:tag "span", :class #{}, :id "sp"}]
                          1}
-                        0.6)
+                        0.5)
            "to be implemented"))))
 
 #_(deftest a-test

@@ -353,6 +353,25 @@
       :else (- (+ (if (seq (:tag b-inst)) 1 0) (count (:class b-inst)))
                (+ (if (seq (:tag a-inst)) 1 0) (count (:class a-inst)))))))
 
+
+(s/fdef select-uni-inst
+        :args (s/cat :inst-support
+                     (s/map-of ::expr pos-int?)
+                     :threshold double?
+                     :total-support pos-int?))
+(defn select-uni-inst
+  [inst-support threshold total-support]
+  (reduce 
+    (fn [acc e]
+      (if-not (seq acc)
+        (let [counted (apply + (vals (filter (fn [[inst _]] (agree? [inst] [e])) 
+                                             inst-support)))]
+          (if (> counted (* total-support threshold))
+            e))
+        acc))
+    nil
+    (sort compare-instruction (keys inst-support))))
+
 (s/fdef unify-exprs
         :args (s/cat :exprs-with-supports 
                      (s/map-of (s/coll-of ::expr) pos-int?)
@@ -375,18 +394,8 @@
                                        agreed))]
           (if-not (seq? instructions)
             agreed-path
-            (reduce (fn [acc expr] 
-                      (let [score (apply + (map :support 
-                                                (filter (fn [{:keys [inst support]}] 
-                                                          (agree? [inst] [expr]))  
-                                                        instructions)))] 
-                        (if (> score (* threshold * total-support))
-                          :recur
-                          ))) 
-                    nil
-                    (sort compare-instruction (map :inst instructions)))
-            ))
-        ))))
+            (let [inst (select-uni-inst instructions threshold total-support)]
+              (recur (inc iter) agreed (conj agreed-path inst)))))))))
 
 (s/fdef synthesis
         :args (s/cat :attributes 
