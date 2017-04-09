@@ -343,8 +343,8 @@
           outer-div (first (.select text "html > body > div"))]
       (is (= (generate-attr-exprs (parse-css-selector "html > body > div") 
                                   {"http://foo.com" {:title #{inner-div} :date #{span}}} 
-                                  0.5) 
-             "to be implemented")))))
+                                  1.0) 
+             {:title "div" :date "span"})))))
 
 #_(deftest a-test
     (testing ""
