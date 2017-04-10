@@ -247,14 +247,10 @@
                               {:tag "span", :class #{}, :id "sp"}])
            "html > body > div#bar.hoge.piyo > span#sp"))))
 
-
-
 (deftest create-relative-path-test
   (testing "returns a css selector which specifies e"
     (let [node (first (.select (Jsoup/parse "<html><body><div class=\"hoge\"><span id=\"sp\"></span></div></html>") "html > body > div > span#sp"))]
       (is (= (create-relative-path node) "html > body > div.hoge > span#sp")))))
-
-
 
 (deftest generate-container-cand-exprs-test
   (testing "generates the expressions of the specified containers"
