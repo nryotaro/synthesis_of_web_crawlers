@@ -1,7 +1,7 @@
 (ns synthesis-crawlers.core
   (:require [clojure.spec :as s]
             [synthesis-crawlers.page :as page]
-            [clojure.string :refer [starts-with? ends-with? join]]
+            [clojure.string :refer [starts-with? ends-with? join split] :as string]
             [org.httpkit.client :as http]
             [clojure.data :refer [diff]])
   (:import (org.jsoup Jsoup)
@@ -31,6 +31,11 @@
 (s/def ::attributed-nodes-in-pages (s/map-of string? 
                                              (s/map-of keyword? 
                                                        (s/coll-of #(instance? Element %)))))
+(s/def ::tag string?)
+(s/def ::class (s/coll-of string?))
+(s/def ::id string?)
+(s/def ::support double?)
+(s/def ::expr (s/keys :req-un [::tag ::class ::id]))
 
 (s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
@@ -69,7 +74,6 @@
    (cond
      (empty? container-expr) attr-expr
      :else (str container-expr " > " attr-expr))})
-
 
 ;; If container is empty, it is interpreted as a node descriptor that extracts the root of the page. 
 ;; If container is empty and f is undefined for every attribute, we say that the data extractor is empty.
@@ -116,7 +120,6 @@
                         text (vals (:pages (sites site)))] 
                     (extract text extractor))]
     (apply (partial merge-with into) extracted)))
-
 
 (s/fdef empty-extractor?
         :args (s/cat :extractor (s/map-of ::container-extractor 
@@ -232,13 +235,16 @@
                                          attr-nodes)))) 
                (vals attributed-nodes-in-pages))))
 
+(s/fdef find-container-node
+        :args (s/cat :node-attrs (s/map-of element? ::attributes)
+                     :all-attrs ::attributes))
 (defn find-container-node
   [node-attrs all-attrs] 
   (set 
     (reduce (fn [acc e] 
               (let [removed (remove #(reach? % e) acc)]
                 (if-not (seq removed)
-                  (conj (filter #(not (reach? %) e) acc) e)
+                  (conj (filter #(not (reach? % e)) acc) e)
                   acc)))
             #{}
             (keys (into {}
@@ -264,13 +270,13 @@
   [node]
   (reverse 
     (reduce (fn [acc node]
-              (conj acc {:tag (.tagName node) :class (.classNames node) :id (.id node)})) 
+              (conj acc {:tag (.tagName node) :class (set (.classNames node)) :id (.id node)})) 
             [] 
             (into [node] (.parents node)))))
 
 (s/fdef decode-node-path
         :args (s/cat :encoded-node
-                     (s/coll-of (s/keys :req-un [::tag ::class ::id]))))
+                     (s/coll-of ::expr)))
 (defn decode-node-path
   [encoded-node]
   (join " > " (map (fn [{:keys [tag class id]}]
@@ -280,32 +286,148 @@
                             (str "." (join "." (sort (vec class)))))))
                    encoded-node)))
 
+
 (defn create-relative-path
   ([prefix node] 
-   (let [path (decode-node-path (encode-node-path node))]
-     (if (seq prefix)
-       (str prefix " > " path)
-       path)))
-  ([node] (create-relative-path "" node)))
+   (let [decoded (create-relative-path node)] 
+     (if-not (seq prefix)
+       decoded
+       (string/replace decoded (re-pattern (str prefix " > ")) "")
+       )
+     ))
+  ([node] (decode-node-path (encode-node-path node))))
 
 (s/fdef generate-container-cand-exprs
         :args (s/cat :container-cand-nodes (s/map-of string? (s/coll-of element?))
                      :support-node-num (s/map-of string? (s/map-of element? pos-int?))))
 (defn generate-container-cand-exprs
   [container-cand-nodes support-node-num]
-  (-> (for [[url container-cands] container-cand-nodes
-            cand container-cands]
-        {:expr (create-relative-path "" cand) :support ((support-node-num url) cand)}) 
-      set 
-      vec))
+  (into {} 
+        (for [[url container-cands] container-cand-nodes
+              cand container-cands]
+          [(create-relative-path cand) ((support-node-num url) cand)])))
+
+(s/fdef parse-css-clause :args (s/cat :clause string?))
+(defn parse-css-clause
+  [clause] 
+  (let [tag (re-seq #"^[^#\.]+" clause)
+        classes (re-seq #"\.([^\.]+)" clause)
+        id (re-seq  #"#([^\.\s]+)" clause)]
+    (hash-map :tag (if (seq tag) (first tag) "")
+              :id (if (seq id) (->> id first second) "")
+              :class (if (seq classes) (set (map second classes)) #{}))))
+
+(defn parse-css-selector
+  [selector]
+  (map #(parse-css-clause %) 
+       (split selector #"\s+>\s+")))
+
+
+(s/fdef agree?
+        :args (s/cat :a (s/coll-of ::expr)
+                     :b (s/coll-of ::expr)))
+(defn agree?
+  "returns true iff a satisfies with b"
+  [a b]
+  (if (< (count a) (count b)) 
+    false
+    (reduce 
+      #(if %1 %2 false)
+      true
+      (map (fn [{atag :tag aclass :class aid :id} 
+                {btag :tag bclass :class bid :id}]
+             (and (or (nil? (seq bid)) (= aid bid))
+                  (or (nil? (seq btag)) (= atag btag))
+                  (nil? (second (diff aclass bclass))))) 
+           a b))))
+
+(s/fdef compare-instruction
+        :args (s/cat :a-inst ::expr :b-inst ::expr))
+(defn compare-instruction
+  [a-inst b-inst]
+  (letfn [(full-filled? [{:keys [tag class id]}] 
+            (and (seq tag) (seq class) (seq id)))]
+    (cond 
+      (agree? [a-inst] [b-inst]) -1
+      (agree? [b-inst] [a-inst]) 1
+      (and (full-filled? a-inst) (full-filled? b-inst)) (- (count (:class b-inst)) 
+                                                           (count (:class a-inst)))
+      (and (seq (:id a-inst)) (not (seq (:id b-inst)))) -1
+      (and (seq (:id b-inst)) (not (seq (:id a-inst)))) 1
+      :else (- (+ (if (seq (:tag b-inst)) 1 0) (count (:class b-inst)))
+               (+ (if (seq (:tag a-inst)) 1 0) (count (:class a-inst)))))))
+
+
+(s/fdef select-uni-inst
+        :args (s/cat :inst-support
+                     (s/map-of ::expr pos-int?)
+                     :threshold double?
+                     :total-support pos-int?))
+(defn select-uni-inst
+  [inst-support threshold total-support]
+  (reduce 
+    (fn [acc e]
+      (if-not (seq acc)
+        (let [counted (apply + (vals (filter (fn [[inst _]] (agree? [inst] [e])) 
+                                             inst-support)))]
+          (if (> counted (* total-support threshold))
+            e))
+        acc))
+    nil
+    (sort compare-instruction (keys inst-support))))
+
+(s/fdef unify-exprs
+        :args (s/cat :exprs-with-supports 
+                     (s/map-of (s/coll-of ::expr) pos-int?)
+                     :threshold double?))
+(defn unify-exprs
+  [exprs-with-supports threshold]
+  (let [total-support (apply + (vals exprs-with-supports))
+        longest  (apply max (map count (keys exprs-with-supports))
+                           #_(map (fn [{:keys [expr]}](count expr)) 
+                                exprs-with-supports))]
+    #_(println total-support )
+    #_(println longest)
+    (loop [iter 0
+           still-agreed exprs-with-supports
+           agreed-path []]
+      #_(println "agreed-path: " agreed-path)
+      (if (>= iter longest)
+        agreed-path
+        (let [agreed (filter (fn [[path _]] (agree? path agreed-path)) still-agreed)
+              instructions (apply (partial merge-with +)
+                                  (map (fn [[path support]]
+                                         (hash-map (nth path iter) support))
+                                       (filter (fn [[k _]](> (count k) iter))
+                                               agreed)
+                                       ))]
+          (if (empty? instructions)
+            agreed-path
+            (let [inst (select-uni-inst instructions threshold total-support)]
+              (recur (inc iter) 
+                     agreed 
+                     (if inst (conj agreed-path inst) agreed-path)))))))))
+
+(s/fdef generate-attr-exprs
+  :args (s/cat :container-descriptions (s/coll-of ::expr)
+               :nodes-in-pages ::attributed-nodes-in-pages
+               :threshold double?))
+(defn generate-attr-exprs
+  [container-descriptions nodes-in-pages threshold]
+  (doall (for [attr (flatten (map keys (vals nodes-in-pages)))]
+    (let [nodes (map #(parse-css-selector (create-relative-path (decode-node-path container-descriptions) %)) (flatten (map #(vec (% attr)) (vals nodes-in-pages))))]
+      (println "nodes: " nodes)
+      [attr (unify-exprs (zipmap nodes (repeat (count nodes) 1)) threshold)]
+      ))))
 
 (s/fdef synthesis
         :args (s/cat :attributes 
                      ::attributes 
                      :sites ::sites 
-                     :site-extractors ::site-extractor))
+                     :site-extractors ::site-extractor
+                     :threshold double?))
 (defn synthesis
-  [attributes sites site-extractors]
+  [attributes sites site-extractors threshold]
   (loop [attr-knowledge {}
          s-extractors site-extractors
          crawled-extractors {}]
@@ -318,12 +440,16 @@
                                                s-extractors)]
         (let [nodes-in-pages (find-nodes-in-page (:pages (sites site)) new-knowledge)
               reachable-attrs (find-reachable-attrs nodes-in-pages)
-              support-nodes (find-support-nodes nodes-in-pages)
+              support-nodes (count-support-nodes (find-support-nodes nodes-in-pages))
               container-cand-nodes (find-container reachable-attrs 
-                                                   (find-best-attr-set reachable-attrs))
+                                                   (find-best-attr-set 
+                                                     nodes-in-pages))
               container-cand-exprs (generate-container-cand-exprs 
                                      container-cand-nodes support-nodes)
-              ]
-          (println nodes-in-pages)
+              container-expr (unify-exprs 
+                               (zipmap (map parse-css-selector (keys container-cand-exprs)) (vals container-cand-exprs))
+                               threshold)
+              attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
+          (println "!!!" container-expr)
           )))))
 
