@@ -159,7 +159,7 @@
             (recur (into (rest nodes) (.children node)) (conj done node))))))))
 
 (s/fdef find-attr-nodes
-        :args (s/cat :nodes #(instance? Elements %) :knowledge ::knowledge)
+        :args (s/cat :nodes #(or (instance? Elements %) element?) :knowledge ::knowledge)
         :ret #(instance? Elements %))
 (defn find-attr-nodes 
   "returns the elements which contain text similar to the specified knowledge"
@@ -185,8 +185,7 @@
                      (fn [k [attr knowledge-set]] (assoc k 
                                                          attr 
                                                          (find-attr-nodes 
-                                                           (.getAllElements 
-                                                             (Jsoup/parse text)) 
+                                                           (filter-duplicated-nodes text)
                                                            knowledge-set))) 
                      {} 
                      attr-knowledge))) 
@@ -454,13 +453,12 @@
                          (zipmap (map parse-css-selector (keys container-cand-exprs)) 
                                  (vals container-cand-exprs))
                          threshold)
-        a (do #_(println "nodes-in-pages: " nodes-in-pages)
-              (println "title " (:title (nodes-in-pages "http://example.com/1")))
-              (println "title: " (count (:title (nodes-in-pages "http://example.com/1"))))
-
-              (println "date: " (:date (nodes-in-pages "http://example.com/1")))
-              (println "date: " (count (:date (nodes-in-pages "http://example.com/1"))))
-
+        a (do (println "nodes-in-pages: " nodes-in-pages)
+              (println "reachable-attrs: " reachable-attrs)
+              (println "support-nodes: " support-nodes)
+              (println "container-cand-nodes: " container-cand-nodes)
+              (println "container-cand-exprs: " container-cand-exprs)
+              (println "container-expr: " container-expr)
               )
         attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
     {(decode-node-path container-expr) attr-exprs}))
