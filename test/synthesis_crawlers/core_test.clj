@@ -250,7 +250,9 @@
 (deftest create-relative-path-test
   (testing "returns a css selector which specifies e"
     (let [node (first (.select (Jsoup/parse "<html><body><div class=\"hoge\"><span id=\"sp\"></span></div></html>") "html > body > div > span#sp"))]
-      (is (= (create-relative-path node) "html > body > div.hoge > span#sp")))))
+      (is (= (create-relative-path node) "html > body > div.hoge > span#sp"))
+      (is (= (create-relative-path "html > body > div.hoge" node) "span#sp"))
+      )))
 
 (deftest generate-container-cand-exprs-test
   (testing "generates the expressions of the specified containers"
@@ -267,15 +269,87 @@
                                   html 2
                                   body 2
                                   span 1}})
-             [{:expr "html > body > div" 
-               :support 2}])))))
+             {"html > body > div" 2})))))
+
+(deftest parse-css-selctor-test
+  (testing "parses the specified css selector"
+    (is (= (parse-css-clause "html") {:tag "html" :class #{} :id ""}))
+    (is (= (parse-css-clause "div#bar.hoge.piyo") {:tag "div" :class #{"hoge" "piyo"} :id "bar"}))
+    (is (=  (parse-css-selector
+              "html > body > div#bar.hoge.piyo > span#sp")
+           [{:tag "html", :class #{}, :id ""} 
+            {:tag "body", :class #{}, :id ""} 
+            {:tag "div", :class #{"hoge" "piyo"}, :id "bar"} 
+            {:tag "span", :class #{}, :id "sp"}]))))
+
+(deftest agree?-test
+  (testing "returns true iff a satisfies with b"
+    (let [t1 (parse-css-selector "html > body > div#id")
+          t2 (parse-css-selector "html > body > div")]
+      (is (= (agree? t1 [])
+             true))
+      (is (= (agree? t1 t2)
+             true))
+      )
+    (is (= (agree? [] [])
+           true))))
+
+
+(deftest sort-instructions-test
+  (testing "sorts the specified instructions"
+    (is (< (compare-instruction {:tag "html" :class #{} :id "#id"}
+                                {:tag "html" :class #{} :id ""})
+           0))
+    (is (> (compare-instruction {:tag "html" :class #{} :id "#id"}
+                                {:tag "html" :class #{"a"} :id "a"})
+           0))
+    (is (> (compare-instruction {:tag "html" :class #{} :id "#id"}
+                                {:tag "html" :class #{"a"} :id "a"})
+           0))
+    (is (> (compare-instruction {:tag "html" :class #{"a"} :id "a"}
+                                {:tag "html" :class #{"a" "b"} :id "id"})
+           0))
+    ))
+
+(deftest select-uni-inst-test
+  (testing "selects unifiled instruction"
+    (is (= (select-uni-inst
+             {{:tag "div" :class #{} :id ""} 1
+              {:tag "div" :class #{} :id "foo"} 1}
+             0.5
+             2)
+           {:tag "div" :class #{} :id ""}))))
+
+(deftest unify-test
+  (testing "unify exprs"
+    (let [s1 (parse-css-selector "html > body > div.foo > div")
+          s2 (parse-css-selector "html > body > div.foo > div.piyo")
+          s3 (parse-css-selector "html > body > div.foo")
+          ]
+      (is (= (decode-node-path (unify-exprs {s1 2 s2 1} 0.6))
+             "html > body > div.foo > div"))
+      (is (= (decode-node-path (unify-exprs {s1 1 s3 1} 0.6))
+             "html > body > div.foo")))))
+
+(deftest generate-attr-exprs-test
+  (testing "generates attribute descriptors"
+    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/generate-attr-exprs.html"))
+          inner-div (first (.select text "html > body > div > div")) 
+          span (first (.select text "html > body > div > span")) 
+          html (first (.select text "html")) 
+          body (first (.select text "html > body")) 
+          outer-div (first (.select text "html > body > div"))]
+      (is (= (generate-attr-exprs (parse-css-selector "html > body > div") 
+                                  {"http://foo.com" {:title #{inner-div} :date #{span}}} 
+                                  0.5) 
+             {:title "div" :date "span"})))))
 
 #_(deftest a-test
     (testing ""
       (is (= nil 
-             nil))))
+             "to be implemented"))))
 
-#_(deftest synthesis-test
+(deftest synthesis-test
   (testing "tests synthesis"
     (is (= (synthesis #{:title} 
                       {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" 
@@ -283,5 +357,6 @@
                        "http://www.newsweek.com" {:url-pattern #"^http://www\.newsweek\.com/.+$"
                                                   :pages {"http://www.newsweek.com/1" "<html><body><div>hello world1</div></body></html>"}}}
                       {"http://www.economist.com" {"html > body" {:title "span"}}
-                       "http://www.newsweek.com" {"" {:title nil}}})
+                       "http://www.newsweek.com" {"" {:title nil}}}
+                      0.5)
            nil))))
