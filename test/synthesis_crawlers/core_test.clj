@@ -351,7 +351,7 @@
                                   0.5) 
              {:title "div" :date "span"})))))
 
-(deftest generate-extractor-test
+#_(deftest generate-extractor-test
   (testing "generates extractors from the speicfied texts and words"
     (is (= (generate-extractors
              {"http://example.com/1" (slurp "dev-resources/synthesis_crawlers/generate-extractor/sample1.html")}

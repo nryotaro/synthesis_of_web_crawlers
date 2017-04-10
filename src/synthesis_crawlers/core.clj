@@ -145,10 +145,18 @@
           knowledge))
 
 (s/fdef filter-duplicated-nodes
-  :args (s/cat :nodes #(instance? Elements %)))
+  :args (s/cat :text string?))
 (defn filter-duplicated-nodes
-  [nodes]
-  nil)
+  [text]
+  (let [root (Jsoup/parse text)]
+    (loop [nodes [root]
+           done #{}]
+      (if-not (seq nodes)
+        done
+        (let [node (first nodes)]
+          (if (seq (filter #(= (.text node) (.text %)) (.children node)))
+            (recur (rest nodes) (conj done node))
+            (recur (rest nodes) done)))))))
 
 (s/fdef find-attr-nodes
         :args (s/cat :nodes #(instance? Elements %) :knowledge ::knowledge)
