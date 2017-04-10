@@ -144,6 +144,12 @@
   (filter #(>= (similarity text %) 0.5 )
           knowledge))
 
+(s/fdef filter-duplicated-nodes
+  :args (s/cat :nodes #(instance? Elements %)))
+(defn filter-duplicated-nodes
+  [nodes]
+  nil)
+
 (s/fdef find-attr-nodes
         :args (s/cat :nodes #(instance? Elements %) :knowledge ::knowledge)
         :ret #(instance? Elements %))
@@ -158,6 +164,7 @@
   "returns true iff b is reachable from a"
   [a b]
   (->> (filter #(= % b) (.getAllElements a)) empty? not))
+
 
 (s/fdef find-nodes-in-page
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
@@ -382,31 +389,29 @@
                      :threshold double?))
 (defn unify-exprs
   [exprs-with-supports threshold]
-  (let [total-support (apply + (vals exprs-with-supports))
-        longest  (apply max (map count (keys exprs-with-supports))
-                           #_(map (fn [{:keys [expr]}](count expr)) 
-                                exprs-with-supports))]
-    #_(println total-support )
-    #_(println longest)
-    (loop [iter 0
-           still-agreed exprs-with-supports
-           agreed-path []]
-      #_(println "agreed-path: " agreed-path)
-      (if (>= iter longest)
-        agreed-path
-        (let [agreed (filter (fn [[path _]] (agree? path agreed-path)) still-agreed)
-              instructions (apply (partial merge-with +)
-                                  (map (fn [[path support]]
-                                         (hash-map (nth path iter) support))
-                                       (filter (fn [[k _]](> (count k) iter))
-                                               agreed)
-                                       ))]
-          (if (empty? instructions)
-            agreed-path
-            (let [inst (select-uni-inst instructions threshold total-support)]
-              (recur (inc iter) 
-                     agreed 
-                     (if inst (conj agreed-path inst) agreed-path)))))))))
+  (when (seq exprs-with-supports)
+    (let [total-support (apply + (vals exprs-with-supports))
+          longest  (apply max (map count (keys exprs-with-supports))
+                          #_(map (fn [{:keys [expr]}](count expr)) 
+                                 exprs-with-supports))]
+      (loop [iter 0
+             still-agreed exprs-with-supports
+             agreed-path []]
+        (if (>= iter longest)
+          agreed-path
+          (let [agreed (filter (fn [[path _]] (agree? path agreed-path)) still-agreed)
+                instructions (apply (partial merge-with +)
+                                    (map (fn [[path support]]
+                                           (hash-map (nth path iter) support))
+                                         (filter (fn [[k _]](> (count k) iter))
+                                                 agreed)
+                                         ))]
+            (if (empty? instructions)
+              agreed-path
+              (let [inst (select-uni-inst instructions threshold total-support)]
+                (recur (inc iter) 
+                       agreed 
+                       (if inst (conj agreed-path inst) agreed-path))))))))))
 
 (s/fdef generate-attr-exprs
   :args (s/cat :container-descriptions (s/coll-of ::expr)
@@ -422,6 +427,35 @@
                            (flatten (map #(vec (% attr)) (vals nodes-in-pages))))]
             [attr (decode-node-path 
                     (unify-exprs (zipmap nodes (repeat (count nodes) 1)) threshold))]))))
+
+(s/fdef generate-extractors
+        :args (s/cat :pages ::pages 
+                     :attributed-knowledge ::attr-knowledge
+                     :threshold double?))
+(defn generate-extractors
+  [pages attributed-knowledge threshold]
+  (let [nodes-in-pages (find-nodes-in-page pages attributed-knowledge)
+        reachable-attrs (find-reachable-attrs nodes-in-pages)
+        support-nodes (count-support-nodes (find-support-nodes nodes-in-pages))
+        container-cand-nodes (find-container reachable-attrs 
+                                             (find-best-attr-set 
+                                               nodes-in-pages))
+        container-cand-exprs (generate-container-cand-exprs 
+                               container-cand-nodes support-nodes)
+        container-expr (unify-exprs 
+                         (zipmap (map parse-css-selector (keys container-cand-exprs)) 
+                                 (vals container-cand-exprs))
+                         threshold)
+        a (do #_(println "nodes-in-pages: " nodes-in-pages)
+              (println "title " (:title (nodes-in-pages "http://example.com/1")))
+              (println "title: " (count (:title (nodes-in-pages "http://example.com/1"))))
+
+              (println "date: " (:date (nodes-in-pages "http://example.com/1")))
+              (println "date: " (count (:date (nodes-in-pages "http://example.com/1"))))
+
+              )
+        attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
+    {(decode-node-path container-expr) attr-exprs}))
 
 (s/fdef synthesis
         :args (s/cat :attributes 
