@@ -252,7 +252,9 @@
 (deftest create-relative-path-test
   (testing "returns a css selector which specifies e"
     (let [node (first (.select (Jsoup/parse "<html><body><div class=\"hoge\"><span id=\"sp\"></span></div></html>") "html > body > div > span#sp"))]
-      (is (= (create-relative-path node) "html > body > div.hoge > span#sp")))))
+      (is (= (create-relative-path node) "html > body > div.hoge > span#sp"))
+      (is (= (create-relative-path "html > body > div.hoge" node) "span#sp"))
+      )))
 
 
 
@@ -343,7 +345,7 @@
           outer-div (first (.select text "html > body > div"))]
       (is (= (generate-attr-exprs (parse-css-selector "html > body > div") 
                                   {"http://foo.com" {:title #{inner-div} :date #{span}}} 
-                                  1.0) 
+                                  0.5) 
              {:title "div" :date "span"})))))
 
 #_(deftest a-test

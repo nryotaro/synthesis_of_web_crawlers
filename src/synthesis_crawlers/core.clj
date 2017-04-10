@@ -1,7 +1,7 @@
 (ns synthesis-crawlers.core
   (:require [clojure.spec :as s]
             [synthesis-crawlers.page :as page]
-            [clojure.string :refer [starts-with? ends-with? join split]]
+            [clojure.string :refer [starts-with? ends-with? join split] :as string]
             [org.httpkit.client :as http]
             [clojure.data :refer [diff]])
   (:import (org.jsoup Jsoup)
@@ -286,13 +286,16 @@
                             (str "." (join "." (sort (vec class)))))))
                    encoded-node)))
 
+
 (defn create-relative-path
   ([prefix node] 
-   (let [path (decode-node-path (encode-node-path node))]
-     (if (seq prefix)
-       (str prefix " > " path)
-       path)))
-  ([node] (create-relative-path "" node)))
+   (let [decoded (create-relative-path node)] 
+     (if-not (seq prefix)
+       decoded
+       (string/replace decoded (re-pattern (str prefix " > ")) "")
+       )
+     ))
+  ([node] (decode-node-path (encode-node-path node))))
 
 (s/fdef generate-container-cand-exprs
         :args (s/cat :container-cand-nodes (s/map-of string? (s/coll-of element?))
@@ -411,10 +414,11 @@
                :threshold double?))
 (defn generate-attr-exprs
   [container-descriptions nodes-in-pages threshold]
-  (for [attr (flatten (map keys (vals nodes-in-pages)))
-        node (flatten (map #(vec (% attr)) (vals nodes-in-pages)))]
-    [attr (create-relative-path node)]
-    ))
+  (doall (for [attr (flatten (map keys (vals nodes-in-pages)))]
+    (let [nodes (map #(parse-css-selector (create-relative-path (decode-node-path container-descriptions) %)) (flatten (map #(vec (% attr)) (vals nodes-in-pages))))]
+      (println "nodes: " nodes)
+      [attr (unify-exprs (zipmap nodes (repeat (count nodes) 1)) threshold)]
+      ))))
 
 (s/fdef synthesis
         :args (s/cat :attributes 
