@@ -155,8 +155,8 @@
         done
         (let [node (first nodes)]
           (if (seq (filter #(= (.text node) (.text %)) (.children node)))
-            (recur (rest nodes) (conj done node))
-            (recur (rest nodes) done)))))))
+            (recur (into (rest nodes) (.children node)) done)
+            (recur (into (rest nodes) (.children node)) (conj done node))))))))
 
 (s/fdef find-attr-nodes
         :args (s/cat :nodes #(instance? Elements %) :knowledge ::knowledge)
