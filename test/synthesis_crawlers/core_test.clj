@@ -95,8 +95,8 @@
 (deftest filter-duplicated-nodes-test
   (testing "returns nodes which don't have innder nodes contain the same text"
     (let [text "<html><body><div><span>abcde</span></div></body></html>"]
-      (is (= (filter-duplicated-nodes (.getAllElements (Jsoup/parse text))) 
-             "to be implemented")))))
+      (is (= (set (map #(.tagName %) (filter-duplicated-nodes text))) 
+             #{"span" "head"})))))
 
 
 (deftest find-attr-nodes-test
