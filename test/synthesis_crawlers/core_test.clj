@@ -92,6 +92,13 @@
     (is (= (matched-knowledge "aa" #{"foobar"}) 
            []))))
 
+(deftest filter-duplicated-nodes-test
+  (testing "returns nodes which don't have innder nodes contain the same text"
+    (let [text "<html><body><div><span>abcde</span></div></body></html>"]
+      (is (= (filter-duplicated-nodes (.getAllElements (Jsoup/parse text))) 
+             "to be implemented")))))
+
+
 (deftest find-attr-nodes-test
   (testing "returns the elements which contain text similar to the specified knowledge"
     (let [text (slurp "dev-resources/synthesis_crawlers/find_textnodes.html")]
@@ -130,7 +137,7 @@
     (let [text "<html><body><div>hoge</div><span>bar foo</span></body></html>"
           nodes (Jsoup/parse text)
           result (find-nodes-in-page {"http://foobar.com" text 
-                                  "http://piyo.com" "<html></html>"} 
+                                      "http://piyo.com" "<html></html>"} 
                                  {:title #{"hoge" "piyo"}})]
       (is (s/valid? (s/map-of string? 
                               (s/map-of keyword? 
@@ -344,12 +351,21 @@
                                   0.5) 
              {:title "div" :date "span"})))))
 
+(deftest generate-extractor-test
+  (testing "generates extractors from the speicfied texts and words"
+    (is (= (generate-extractors
+             {"http://example.com/1" (slurp "dev-resources/synthesis_crawlers/generate-extractor/sample1.html")}
+             {:food #{"bacon" "batter" "black beans"}
+              :date #{"2016-10-02"}}
+             0.5)
+           "to be implemented"))))
+
 #_(deftest a-test
     (testing ""
       (is (= nil 
              "to be implemented"))))
 
-(deftest synthesis-test
+#_(deftest synthesis-test
   (testing "tests synthesis"
     (is (= (synthesis #{:title} 
                       {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" 
