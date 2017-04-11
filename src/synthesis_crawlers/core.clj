@@ -224,8 +224,12 @@
   [url-attr-nodes]
   (let [result (for [[url attr-nodes] url-attr-nodes
                      [attr nodes] attr-nodes
-                     node (set (flatten (map reachable-elements nodes)))]
-                 [url [node nodes]])
+                     node (set (map #(.cssSelector %) (flatten (map reachable-elements nodes))))]
+                 [url [node (map #(.cssSelector %) nodes)]])
+        url-root (zipmap (keys url-attr-nodes) 
+                         (map #(.ownerDocument (first (second (first %)))) 
+                                                (vals url-attr-nodes)))
+        a (println "result: " result)
         support-nodes (reduce (fn [acc [url [node nodes]]] 
                                 (let [node-nodes (get acc url {})
                                       node-set (get node-nodes node #{})]
@@ -234,13 +238,15 @@
                                          (assoc node-nodes node (into node-set nodes)))))
                               {}
                               result)]
-    support-nodes))
+    (into {}
+          (for [[url node-nodes] support-nodes]
+            [url (zipmap (map #(first (.select (url-root url) %)) (keys node-nodes))
+                         (for [nodes (vals node-nodes)](map #(first (.select (url-root url) %)) nodes)))]))))
 
 (s/fdef count-support-nodes
        :args (s/cat :support-nodes (s/map-of string? (s/map-of #(instance? Element %)
-                                                               (s/coll-of #(instance? Element %)
-)
-                                                               ))))
+                                                               (s/coll-of #(instance? Element %))))))
+
 (defn count-support-nodes
   [support-nodes]
   (into {} (for [[url node-nodes] support-nodes]
