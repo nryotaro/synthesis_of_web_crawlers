@@ -225,13 +225,16 @@
   (let [result (for [[url attr-nodes] url-attr-nodes
                      [attr nodes] attr-nodes
                      node (set (flatten (map reachable-elements nodes)))]
-                 [url [node nodes]])]
-    (reduce (fn [acc [url [node nodes]]] 
-              (let [node-nodes (get acc url {})
-                    node-set (get node-nodes node #{})]
-                (assoc acc url (assoc node-nodes node (into node-set nodes)))))
-            {}
-            result)))
+                 [url [node nodes]])
+        support-nodes (reduce (fn [acc [url [node nodes]]] 
+                                (let [node-nodes (get acc url {})
+                                      node-set (get node-nodes node #{})]
+                                  (assoc acc 
+                                         url 
+                                         (assoc node-nodes node (into node-set nodes)))))
+                              {}
+                              result)]
+    support-nodes))
 
 (s/fdef count-support-nodes
        :args (s/cat :support-nodes (s/map-of string? (s/map-of #(instance? Element %)
@@ -461,11 +464,11 @@
                                  (vals container-cand-exprs))
                          threshold)
         a  (do 
-                (println "find-reacabhel-attrs: " nodes-in-pages)
-                (println "reachable-attrs: " reachable-attrs)
-                (println "reachable-attrs: " (count (reachable-attrs "http://example.com/1")))
-
-                (println "support-nodes: " support-nodes))
+                #_(println "find-reacabhel-attrs: " nodes-in-pages)
+                #_(println "reachable-attrs: " reachable-attrs)
+                #_(println "reachable-attrs: " (count (reachable-attrs "http://example.com/1")))
+                (println "support-nodes-raw: "(find-support-nodes nodes-in-pages))
+                #_(println "support-nodes: " support-nodes))
         attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
     {(decode-node-path container-expr) attr-exprs}))
 
