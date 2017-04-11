@@ -200,10 +200,13 @@
         :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
 (defn find-reachable-attrs 
   [attr-nodes] 
+  (println "given: " attr-nodes)
   (let [result (for [[url attr-nodes] attr-nodes
                      [attr nodes] attr-nodes
                      node (set (flatten (map reachable-elements nodes)))] 
                  [url [node attr]])]
+    (println "result: " result)
+    (println "--")
     (reduce (fn [acc [url [node attr]]] 
               (let [node-attr (get acc url {})
                     attrs (get node-attr node #{})]
@@ -267,7 +270,7 @@
 
 (s/fdef find-container
         :args (s/cat :reachable-attr-nodes
-                     (s/map-of string? (s/map-of #(instance? Element %)
+                     (s/map-of string? (s/map-of element?
                                                  (s/coll-of keyword?)))
                      :url-attrs
                      (s/map-of string? (s/coll-of keyword?))))
@@ -453,13 +456,9 @@
                          (zipmap (map parse-css-selector (keys container-cand-exprs)) 
                                  (vals container-cand-exprs))
                          threshold)
-        a (do (println "nodes-in-pages: " nodes-in-pages)
-              (println "reachable-attrs: " reachable-attrs)
-              (println "support-nodes: " support-nodes)
-              (println "container-cand-nodes: " container-cand-nodes)
-              (println "container-cand-exprs: " container-cand-exprs)
-              (println "container-expr: " container-expr)
-              )
+        a nil #_(do (println "find-reacabhel-attrs: " nodes-in-pages)
+              (println "type: " (type (:food (nodes-in-pages "http://example.com/1"))))
+            (println "reachable-attrs: "(find-reachable-attrs nodes-in-pages)))
         attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
     {(decode-node-path container-expr) attr-exprs}))
 
