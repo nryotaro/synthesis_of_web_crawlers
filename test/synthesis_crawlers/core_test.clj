@@ -149,7 +149,8 @@
 
 (deftest find-reachable-attrs-test
   (testing "finds nodes which can be candidates of conainters"
-    #_(let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
+    (let [text (Jsoup/parse 
+                 (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
          inner-div (first (.select text "html > body > div > div")) 
          html (first (.select text "html")) 
          body (first (.select text "html > body")) 
@@ -162,14 +163,8 @@
                                 outer-div #{:date :title}
                                 html #{:date :title}
                                 body #{:date :title}
-                                span #{:date}}})))
-    #_(let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs1.html"))
-          span (first (.select text "span"))
-          div (first (.select text "html > body > article > div > div"))
-          outer-div (first (.select text "html > body > article > div"))]
-      (is (= (find-reachable-attrs {"http://example.com/1" {:food [div] :date [span outer-div]}})
-             nil)))
-    ))
+                                span #{:date}}})))))
+
 (deftest find-support-nodes-test
   (testing "returns nodes which can be reachable from the specified nodes, 
            and contain attributes"
