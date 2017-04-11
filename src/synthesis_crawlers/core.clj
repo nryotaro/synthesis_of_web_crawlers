@@ -200,25 +200,23 @@
         :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
 (defn find-reachable-attrs 
   [attr-nodes] 
-  (println "given: " attr-nodes)
   (let [result (for [[url attr-nodes] attr-nodes
                      [attr nodes] attr-nodes
                      node (set (map #(.cssSelector %) 
                                     (flatten (map reachable-elements nodes))))] 
                  [url [node attr]])
-        url-root (zipmap (keys attr-nodes) (map #(.ownerDocument (first (second (first %)))) 
+        url-root (zipmap (keys attr-nodes) 
+                         (map #(.ownerDocument (first (second (first %)))) 
                                                 (vals attr-nodes)))
         reachable-attrs (reduce (fn [acc [url [node attr]]] 
                                   (let [node-attr (get acc url {})
                                         attrs (get node-attr node #{})]
                                     (assoc acc url (assoc node-attr node (conj attrs attr)))))
                                 {} 
-                                result)
-        ]
-    (println "url-root: " url-root)
-    (println "reachable-attrs: " reachable-attrs)
-    #_(println "vals:" (map #(.cssSelector %) (keys (reachable-attrs "http://example.com/1"))))
-    reachable-attrs))
+                                result)]
+    (into {} (for [[url node-attrs] reachable-attrs]
+               [url (zipmap (map #(first (.select (url-root url) %)) (keys node-attrs))
+                            (vals node-attrs))]))))
 
 (s/fdef find-support-nodes
         :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
@@ -462,9 +460,12 @@
                          (zipmap (map parse-css-selector (keys container-cand-exprs)) 
                                  (vals container-cand-exprs))
                          threshold)
-        a nil #_(do (println "find-reacabhel-attrs: " nodes-in-pages)
-              (println "type: " (type (:food (nodes-in-pages "http://example.com/1"))))
-            (println "reachable-attrs: "(find-reachable-attrs nodes-in-pages)))
+        a  (do 
+                (println "find-reacabhel-attrs: " nodes-in-pages)
+                (println "reachable-attrs: " reachable-attrs)
+                (println "reachable-attrs: " (count (reachable-attrs "http://example.com/1")))
+
+                (println "support-nodes: " support-nodes))
         attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
     {(decode-node-path container-expr) attr-exprs}))
 
