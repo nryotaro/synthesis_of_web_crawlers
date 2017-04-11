@@ -203,16 +203,22 @@
   (println "given: " attr-nodes)
   (let [result (for [[url attr-nodes] attr-nodes
                      [attr nodes] attr-nodes
-                     node (set (flatten (map reachable-elements nodes)))] 
-                 [url [node attr]])]
-    (println "result: " result)
-    (println "--")
-    (reduce (fn [acc [url [node attr]]] 
-              (let [node-attr (get acc url {})
-                    attrs (get node-attr node #{})]
-                (assoc acc url (assoc node-attr node (conj attrs attr)))))
-            {} 
-            result)))
+                     node (set (map #(.cssSelector %) 
+                                    (flatten (map reachable-elements nodes))))] 
+                 [url [node attr]])
+        url-root (zipmap (keys attr-nodes) (map #(.ownerDocument (first (second (first %)))) 
+                                                (vals attr-nodes)))
+        reachable-attrs (reduce (fn [acc [url [node attr]]] 
+                                  (let [node-attr (get acc url {})
+                                        attrs (get node-attr node #{})]
+                                    (assoc acc url (assoc node-attr node (conj attrs attr)))))
+                                {} 
+                                result)
+        ]
+    (println "url-root: " url-root)
+    (println "reachable-attrs: " reachable-attrs)
+    #_(println "vals:" (map #(.cssSelector %) (keys (reachable-attrs "http://example.com/1"))))
+    reachable-attrs))
 
 (s/fdef find-support-nodes
         :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
