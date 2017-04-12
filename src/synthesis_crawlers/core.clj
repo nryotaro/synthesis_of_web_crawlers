@@ -168,20 +168,19 @@
   (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes))
 
 (s/fdef reach?
-        :args (s/cat :a #(instance? Element %) :b #(instance? Element %)))
+        :args (s/cat :a element? :b element?))
 (defn reach?
   "returns true iff b is reachable from a"
   [a b]
   (->> (filter #(= % b) (.getAllElements a)) empty? not))
 
-(s/fdef find-nodes
+#_(s/fdef find-nodes
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
-(defn find-nodes
+#_(defn find-nodes
   [pages attr-knowledge]
   (for [[url text] pages
         [attribute words] attr-knowledge]
-    nil)
-  )
+    nil))
 
 (s/fdef find-nodes-in-page
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))

@@ -144,10 +144,15 @@
                                         (s/coll-of #(instance? Element %)))) 
                     result))
       (is (= (count (:title (result "http://foobar.com"))) 1))
-      (is (= (result "http://piyo.com") {:title []})))
-    ))
+      (is (= (result "http://piyo.com") {:title []}))))
+  (testing "test case2"
+    (is (= (find-nodes-in-page 
+             {"http://example.com/1" 
+              (slurp "dev-resources/synthesis_crawlers/generate-extractor/sample1.html")}
+             {:food #{"bacon" "batter" "black beans"}
+              :date #{"2016-10-02"}}) "to be implemented"))))
 
-(deftest find-nodes-test
+#_(deftest find-nodes-test
   (testing "finds nodes in the specified page."
     (is (= (find-nodes 
              {"http://example.com/1" (slurp "dev-resources/synthesis_crawlers/generate-extractor/sample1.html")}
