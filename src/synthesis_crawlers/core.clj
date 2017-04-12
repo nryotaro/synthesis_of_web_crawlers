@@ -16,6 +16,7 @@
 (s/def ::attribute keyword?)
 (s/def ::attributes (s/coll-of ::attribute))
 (s/def ::url-pattern #(instance? java.util.regex.Pattern %))
+
 (s/def ::pages (s/map-of string? string?))
 (s/def ::sites (s/map-of string? (s/keys :req-un [::url-pattern ::pages])))
 (s/def ::knowledge (s/coll-of string?))
@@ -193,11 +194,14 @@
             (assoc acc 
                    url 
                    (reduce 
-                     (fn [k [attr knowledge-set]] (assoc k 
-                                                         attr 
-                                                         (find-attr-nodes 
-                                                           (filter-duplicated-nodes text)
-                                                           knowledge-set))) 
+                     (fn [k [attr knowledge-set]] 
+                       (assoc k 
+                              attr 
+                              (set 
+                                (map #(.cssSelector %) 
+                                     (find-attr-nodes 
+                                       (filter-duplicated-nodes text)
+                                       knowledge-set))))) 
                      {} 
                      attr-knowledge))) 
           {} 
