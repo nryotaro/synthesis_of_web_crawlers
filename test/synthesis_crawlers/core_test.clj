@@ -99,7 +99,7 @@
              #{"span" "head"})))))
 
 
-(deftest find-attr-nodes-test
+#_(deftest find-attr-nodes-test
   (testing "returns the elements which contain text similar to the specified knowledge"
     (let [text (slurp "dev-resources/synthesis_crawlers/find_textnodes.html")]
       (is (= (map #(.text %)
@@ -151,16 +151,22 @@
            {"http://example.com/1" {:food #{"html > body > article > div > div"} 
                                     :date #{"html > body > article > div > span"}}}))))
 
-#_(deftest find-nodes-test
-  (testing "finds nodes in the specified page."
-    (is (= (find-nodes 
-             {"http://example.com/1" (slurp "dev-resources/synthesis_crawlers/generate-extractor/sample1.html")}
-             {:food #{"bacon" "batter" "black beans"}
-              :date #{"2016-10-02"}}) "to be implemented"))))
-
 (deftest find-reachable-attrs-test
   (testing "finds nodes which can be candidates of conainters"
-    (let [text (Jsoup/parse 
+    (let [text (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html")
+          body "html > body"
+          inner-div "html > body > div > div"
+          outer-div "html > body > div"
+          span "html > body > div >span"
+          html "html"]
+      (is (= (find-reachable-attrs {"http://foo.com/1" {:title [inner-div] :date [span]}}
+                                   {"http://foo.com/1" text})
+             {"http://foo.com/1" {inner-div #{:title}
+                                  outer-div #{:date :title}
+                                  html #{:date :title}
+                                  body #{:date :title}
+                                  span #{:date}}})))
+    #_(let [text (Jsoup/parse 
                  (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
          inner-div (first (.select text "html > body > div > div")) 
          html (first (.select text "html")) 

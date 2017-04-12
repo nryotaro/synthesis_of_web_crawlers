@@ -172,11 +172,14 @@
 (defn find-attr-nodes 
   "returns the elements which contain text similar to the specified knowledge"
   [nodes knowledge]
-  (reduce 
-    (fn [nodes node]
-      (conj (filter #(not (reach? % node)) nodes) node))
-    [] 
-    (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes)))
+  (let [result (reduce 
+                 (fn [nodes node]
+                   (conj (filter #(not (reach? % node)) nodes) node))
+                 [] 
+                 (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes))]
+    (println "knowledge: " knowledge)
+    (println "find-attr-nodes: " result)
+    result))
 
 #_(s/fdef find-nodes
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
@@ -212,9 +215,10 @@
   (conj (into [] (.parents elem)) elem))
 
 (s/fdef find-reachable-attrs
-        :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
+        :args (s/cat :attr-nodes ::attributed-nodes-in-pages
+                     :pages ::pages))
 (defn find-reachable-attrs 
-  [attr-nodes] 
+  [attr-nodes pages] 
   (let [result (for [[url attr-nodes] attr-nodes
                      [attr nodes] attr-nodes
                      node (set (map #(.cssSelector %) 
