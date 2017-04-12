@@ -159,20 +159,23 @@
             (recur (into (rest nodes) (.children node)) done)
             (recur (into (rest nodes) (.children node)) (conj done node))))))))
 
-(s/fdef find-attr-nodes
-        :args (s/cat :nodes #(or (instance? Elements %) element?) :knowledge ::knowledge)
-        :ret #(instance? Elements %))
-(defn find-attr-nodes 
-  "returns the elements which contain text similar to the specified knowledge"
-  [nodes knowledge]
-  (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes))
-
 (s/fdef reach?
         :args (s/cat :a element? :b element?))
 (defn reach?
   "returns true iff b is reachable from a"
   [a b]
   (->> (filter #(= % b) (.getAllElements a)) empty? not))
+
+(s/fdef find-attr-nodes
+        :args (s/cat :nodes #(or (instance? Elements %) element?) :knowledge ::knowledge))
+(defn find-attr-nodes 
+  "returns the elements which contain text similar to the specified knowledge"
+  [nodes knowledge]
+  (reduce 
+    (fn [nodes node]
+      (conj (filter #(not (reach? % node)) nodes) node))
+    [] 
+    (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes)))
 
 #_(s/fdef find-nodes
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
