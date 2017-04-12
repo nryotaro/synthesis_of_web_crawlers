@@ -147,6 +147,7 @@
 (s/fdef filter-duplicated-nodes
   :args (s/cat :text string?))
 (defn filter-duplicated-nodes
+  "returns nodes which don't have inner nodes contain the same text"
   [text]
   (let [root (Jsoup/parse text)]
     (loop [nodes [root]
@@ -177,7 +178,9 @@
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
 (defn find-nodes
   [pages attr-knowledge]
-
+  (for [[url text] pages
+        [attribute words] attr-knowledge]
+    nil)
   )
 
 (s/fdef find-nodes-in-page
