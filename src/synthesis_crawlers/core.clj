@@ -173,6 +173,12 @@
   [a b]
   (->> (filter #(= % b) (.getAllElements a)) empty? not))
 
+(s/fdef find-nodes
+  :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
+(defn find-nodes
+  [pages attr-knowledge]
+
+  )
 
 (s/fdef find-nodes-in-page
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
@@ -218,6 +224,8 @@
                [url (zipmap (map #(first (.select (url-root url) %)) (keys node-attrs))
                             (vals node-attrs))]))))
 
+
+;; nested nodes aren't supported.
 (s/fdef find-support-nodes
         :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
 (defn find-support-nodes
@@ -229,7 +237,6 @@
         url-root (zipmap (keys url-attr-nodes) 
                          (map #(.ownerDocument (first (second (first %)))) 
                                                 (vals url-attr-nodes)))
-        a (println "result: " result)
         support-nodes (reduce (fn [acc [url [node nodes]]] 
                                 (let [node-nodes (get acc url {})
                                       node-set (get node-nodes node #{})]
@@ -469,12 +476,6 @@
                          (zipmap (map parse-css-selector (keys container-cand-exprs)) 
                                  (vals container-cand-exprs))
                          threshold)
-        a  (do 
-                #_(println "find-reacabhel-attrs: " nodes-in-pages)
-                #_(println "reachable-attrs: " reachable-attrs)
-                #_(println "reachable-attrs: " (count (reachable-attrs "http://example.com/1")))
-                (println "support-nodes-raw: "(find-support-nodes nodes-in-pages))
-                #_(println "support-nodes: " support-nodes))
         attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
     {(decode-node-path container-expr) attr-exprs}))
 
