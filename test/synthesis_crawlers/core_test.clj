@@ -135,24 +135,21 @@
 (deftest find-nodes-in-page-test
   (testing "Finds nodes in a page."
     (let [text "<html><body><div>hoge</div><span>bar foo</span></body></html>"
-          nodes (Jsoup/parse text)
-          result (find-nodes-in-page {"http://foobar.com" text 
-                                      "http://piyo.com" "<html></html>"} 
-                                 {:title #{"hoge" "piyo"}})]
-      (println result)
-      (is (s/valid? (s/map-of string? 
-                              (s/map-of keyword? 
-                                        (s/coll-of #(instance? Element %)))) 
-                    result))
-      (is (= (count (:title (result "http://foobar.com"))) 1))
-      (is (= (result "http://piyo.com") {:title []}))))
-  (testing "test case2"
+          nodes (Jsoup/parse text)]
+      (is (= (find-nodes-in-page {"http://foobar.com" text 
+                                  "http://piyo.com" "<html></html>"} 
+                                 {:title #{"hoge" "piyo"}})
+             {"http://foobar.com" {:title #{"html > body > div"}}
+              "http://piyo.com" {:title #{}}}))))
+  (testing "each returned node isn't reachable from other nodes 
+           as long as they are in the same attribute set"
     (is (= (find-nodes-in-page 
              {"http://example.com/1" 
               (slurp "dev-resources/synthesis_crawlers/generate-extractor/sample1.html")}
              {:food #{"bacon" "batter" "black beans"}
               :date #{"2016-10-02"}}) 
-           "to be implemented"))))
+           {"http://example.com/1" {:food #{"html > body > article > div > div"} 
+                                    :date #{"html > body > article > div > span"}}}))))
 
 #_(deftest find-nodes-test
   (testing "finds nodes in the specified page."
