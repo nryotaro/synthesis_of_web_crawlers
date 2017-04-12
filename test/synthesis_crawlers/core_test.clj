@@ -144,8 +144,15 @@
                                         (s/coll-of #(instance? Element %)))) 
                     result))
       (is (= (count (:title (result "http://foobar.com"))) 1))
-      (is (= (result "http://piyo.com") {:title []}))
-      )))
+      (is (= (result "http://piyo.com") {:title []})))
+    ))
+
+(deftest find-nodes-test
+  (testing "finds nodes in the specified page."
+    (is (= (find-nodes 
+             {"http://example.com/1" (slurp "dev-resources/synthesis_crawlers/generate-extractor/sample1.html")}
+             {:food #{"bacon" "batter" "black beans"}
+              :date #{"2016-10-02"}}) "to be implemented"))))
 
 (deftest find-reachable-attrs-test
   (testing "finds nodes which can be candidates of conainters"
@@ -234,7 +241,6 @@
                                   span #{:date}}}
                {"http://foo.com" #{:title :date}})
              {"http://foo.com" #{outer-div}})))))
-
 
 (deftest encode-node-path-test
   (testing "builds node path"
