@@ -33,6 +33,11 @@
 (s/def ::attributed-nodes-in-pages (s/map-of string? 
                                              (s/map-of keyword? 
                                                        (s/coll-of string?))))
+
+(s/def ::url string?)
+(s/def ::selector string?)
+(s/def ::reachable-attributes (s/map-of ::url (s/map-of ::selector ::attributes)))
+
 (s/def ::tag string?)
 (s/def ::class (s/coll-of string?))
 (s/def ::id string?)
@@ -287,7 +292,7 @@
                (vals attributed-nodes-in-pages))))
 
 (s/fdef find-container-node
-        :args (s/cat :node-attrs (s/map-of element? ::attributes)
+        :args (s/cat :node-attrs (s/map-of ::selector ::attributes)
                      :all-attrs ::attributes
                      :text ::text))
 (defn find-container-node
@@ -308,13 +313,9 @@
                                          node-attrs)))))))))
 
 (s/fdef find-container
-        :args (s/cat :reachable-attr-nodes
-                     (s/map-of string? (s/map-of element?
-                                                 (s/coll-of keyword?)))
-                     :url-attrs
-                     (s/map-of string? (s/coll-of keyword?))
-                     :pages
-                     ::pages))
+        :args (s/cat :reachable-attr-nodes ::reachable-attributes
+                     :url-attrs (s/map-of ::url ::attributes)
+                     :pages ::pages))
 (defn find-container
   [reachable-attr-nodes url-attrs pages]
   (into {}
@@ -326,9 +327,6 @@
         :args (s/cat :node element?))
 (defn encode-node-path
   [node]
-  (println "node: " node)
-  (println "node: " (element? node))
-  (println "node: " "--")
   (reverse 
     (reduce (fn [acc node]
               (conj acc {:tag (.tagName node) :class (set (.classNames node)) :id (.id node)})) 
