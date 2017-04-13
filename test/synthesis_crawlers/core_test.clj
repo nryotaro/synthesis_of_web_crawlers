@@ -252,8 +252,7 @@
                                   body #{:date :title}
                                   span #{:date}}}
                {"http://foo.com" #{:title :date}}
-               {"http://foo.com" text}
-               )
+               {"http://foo.com" text})
              {"http://foo.com" #{outer-div}})))))
 
 (deftest encode-node-path-test
