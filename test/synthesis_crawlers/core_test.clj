@@ -157,7 +157,7 @@
           body "html > body"
           inner-div "html > body > div > div"
           outer-div "html > body > div"
-          span "html > body > div >span"
+          span "html > body > div > span"
           html "html"]
       (is (= (find-reachable-attrs {"http://foo.com/1" {:title [inner-div] :date [span]}}
                                    {"http://foo.com/1" text})
@@ -166,6 +166,7 @@
                                   html #{:date :title}
                                   body #{:date :title}
                                   span #{:date}}})))
+
     #_(let [text (Jsoup/parse 
                  (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
          inner-div (first (.select text "html > body > div > div")) 
