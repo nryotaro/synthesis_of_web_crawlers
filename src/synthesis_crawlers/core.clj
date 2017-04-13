@@ -41,7 +41,6 @@
 (s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
   "returns true value iff the specified extractor is incomplete"
-
   [a b]
  (.similarity (Jaccard.) a b))
 
@@ -165,21 +164,25 @@
 (defn reach?
   "returns true iff b is reachable from a"
   [a b]
-  (->> (filter #(= % b) (.getAllElements a)) empty? not))
+  (->> (filter #(.is b (.cssSelector %)) (.getAllElements a)) empty? not))
 
 (s/fdef find-attr-nodes
         :args (s/cat :nodes #(or (instance? Elements %) element?) :knowledge ::knowledge))
 (defn find-attr-nodes 
   "returns the elements which contain text similar to the specified knowledge"
   [nodes knowledge]
-  (let [result (reduce 
-                 (fn [nodes node]
-                   (conj (filter #(not (reach? % node)) nodes) node))
-                 [] 
-                 (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes))]
-    (println "knowledge: " knowledge)
-    (println "find-attr-nodes: " result)
-    result))
+  (reduce 
+    (fn [nodes node]
+      (let [p (filter #(reach? % node) nodes)
+            c (filter #(reach? node %) nodes)]
+        (cond 
+          ; nodes contain a node which is a parent of node
+          (seq p) (conj (remove p nodes p) node)
+          ; node is a parent of one of nodes
+          (seq c) nodes
+          :else (conj nodes node))))
+    [] 
+    (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes)))
 
 #_(s/fdef find-nodes
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
