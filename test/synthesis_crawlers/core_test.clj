@@ -362,13 +362,14 @@
 
 (deftest generate-attr-exprs-test
   (testing "generates attribute descriptors"
-    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/generate-attr-exprs.html"))
-          inner-div (first (.select text "html > body > div > div")) 
-          span (first (.select text "html > body > div > span")) 
-          html (first (.select text "html")) 
-          body (first (.select text "html > body")) 
-          outer-div (first (.select text "html > body > div"))]
-      (is (= (generate-attr-exprs (parse-css-selector "html > body > div") 
+    (let [text (slurp "dev-resources/synthesis_crawlers/generate-attr-exprs.html")
+          inner-div "html > body > div > div"
+          span "html > body > div > span"
+          html "html"
+          body "html > body"
+          outer-div "html > body > div"
+          parsed (parse-css-selector "html > body > div")]
+      (is (= (generate-attr-exprs parsed 
                                   {"http://foo.com" {:title #{inner-div} :date #{span}}} 
                                   0.5) 
              {:title "div" :date "span"})))))
