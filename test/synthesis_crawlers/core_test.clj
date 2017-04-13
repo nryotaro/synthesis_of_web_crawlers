@@ -227,13 +227,14 @@
 
 (deftest finds-container-test
   (testing "finds the container node in each page"
-    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
-          inner-div (first (.select text "html > body > div > div")) 
-          html (first (.select text "html")) 
-          body (first (.select text "html > body")) 
-          span (first (.select text "html > body > div > span")) 
-          outer-div (first (.select text "html > body > div"))
-          result (find-best-attr-set
+    (let [text (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html")
+          inner-div "html > body > div > div"
+          html "html"
+          body "html > body"
+          span "html > body > div > span"
+          outer-div "html > body > div"
+          ;result 
+          #_(find-best-attr-set
                    {"http://foo.com" {:title [inner-div] :date [span] :body []}})]
       (is (= (find-container-node 
                {inner-div #{:title}
@@ -241,7 +242,8 @@
                 html #{:date :title}
                 body #{:date :title}
                 span #{:date}}
-               #{:title :date})
+               #{:title :date}
+               text)
              #{outer-div}))
       (is (= (find-container 
                {"http://foo.com" {inner-div #{:title}

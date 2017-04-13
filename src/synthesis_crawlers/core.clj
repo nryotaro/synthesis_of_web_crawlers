@@ -288,19 +288,24 @@
 
 (s/fdef find-container-node
         :args (s/cat :node-attrs (s/map-of element? ::attributes)
-                     :all-attrs ::attributes))
+                     :all-attrs ::attributes
+                     :text ::text))
 (defn find-container-node
-  [node-attrs all-attrs] 
-  (set 
-    (reduce (fn [acc e] 
-              (let [removed (remove #(reach? % e) acc)]
-                (if-not (seq removed)
-                  (conj (filter #(not (reach? % e)) acc) e)
-                  acc)))
-            #{}
-            (keys (into {}
-                        (filter (fn [[node attrs]] (= all-attrs attrs))
-                                node-attrs))))))
+  [node-attrs all-attrs text] 
+  (let [document (Jsoup/parse text)]
+    (set 
+      (map #(.cssSelector %)
+           (reduce (fn [acc e] 
+                     (let [removed (remove #(reach? % e) acc)]
+                       (if-not (seq removed)
+                         (conj (filter #(not (reach? % e)) acc) e)
+                         acc)))
+                   #{}
+                   (map 
+                     #(first (.select document %))
+                     (keys (into {}
+                                 (filter (fn [[node attrs]] (= all-attrs attrs))
+                                         node-attrs)))))))))
 
 (s/fdef find-container
         :args (s/cat :reachable-attr-nodes
