@@ -174,8 +174,7 @@
           span "html > body > div > span"
           outer-div "html > body > div"
           result (find-reachable-attrs {"http://foo.com" {:title [inner-div] :date [span]}}
-                                       {"http://foo.com" text}
-                                       )]
+                                       {"http://foo.com" text})]
       (is (= result
              {"http://foo.com" {inner-div #{:title}
                                 outer-div #{:date :title}
@@ -186,14 +185,15 @@
 (deftest find-support-nodes-test
   (testing "returns nodes which can be reachable from the specified nodes, 
            and contain attributes"
-    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-support-nodes.html"))
-          inner-div (first (.select text "html > body > div > div")) 
-          html (first (.select text "html")) 
-          body (first (.select text "html > body")) 
-          span (first (.select text "html > body > div > span")) 
-          outer-div (first (.select text "html > body > div"))
+    (let [text (slurp "dev-resources/synthesis_crawlers/find-support-nodes.html")
+          inner-div "html > body > div > div"
+          html "html"
+          body "html > body"
+          span "html > body > div > span"
+          outer-div "html > body > div"
           result (find-support-nodes
-                   {"http://foo.com" {:title [inner-div] :date [span]}})]
+                   {"http://foo.com" {:title [inner-div] :date [span]}}
+                   {"http://foo.com" text})]
       (is (= result
              {"http://foo.com" {inner-div #{inner-div}
                                 outer-div #{inner-div span}
