@@ -167,15 +167,15 @@
                                   body #{:date :title}
                                   span #{:date}}})))
 
-    #_(let [text (Jsoup/parse 
-                 (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
-         inner-div (first (.select text "html > body > div > div")) 
-         html (first (.select text "html")) 
-         body (first (.select text "html > body")) 
-         span (first (.select text "html > body > div > span")) 
-         outer-div (first (.select text "html > body > div"))
-         result (find-reachable-attrs 
-                  {"http://foo.com" {:title [inner-div] :date [span]}})]
+    (let [text (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html")
+          inner-div "html > body > div > div" 
+          html "html" 
+          body "html > body"
+          span "html > body > div > span"
+          outer-div "html > body > div"
+          result (find-reachable-attrs {"http://foo.com" {:title [inner-div] :date [span]}}
+                                       {"http://foo.com" text}
+                                       )]
       (is (= result
              {"http://foo.com" {inner-div #{:title}
                                 outer-div #{:date :title}
