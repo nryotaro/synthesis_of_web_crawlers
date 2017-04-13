@@ -31,7 +31,7 @@
                                       ::complete-attr-extractor))
 (s/def ::attributed-nodes-in-pages (s/map-of string? 
                                              (s/map-of keyword? 
-                                                       (s/coll-of #(instance? Element %)))))
+                                                       (s/coll-of string?))))
 (s/def ::tag string?)
 (s/def ::class (s/coll-of string?))
 (s/def ::id string?)
@@ -210,17 +210,22 @@
   [elem]
   (conj (into [] (.parents elem)) elem))
 
+(defn find-parents
+  [selector text]
+  (reachable-elements (first (.select (Jsoup/parse text) selector))))
+
 (s/fdef find-reachable-attrs
         :args (s/cat :attr-nodes ::attributed-nodes-in-pages
                      :pages ::pages))
 (defn find-reachable-attrs 
   [attr-nodes pages] 
-  (let [result (for [[url attr-nodes] attr-nodes
-                     [attr nodes] attr-nodes
-                     node (set (map #(.cssSelector %) 
-                                    (flatten (map reachable-elements nodes))))] 
-                 [url [node attr]])
-        url-root (zipmap (keys attr-nodes) 
+  (let [result (for [[url attr-selectors] attr-nodes
+                     [attr selectors] attr-selectors
+                     selector (set (map #(.cssSelector %) 
+                                    (flatten (map #(find-parents % (pages url)) selectors))))] 
+                 [url [selector attr]])
+        ;url-root 
+        #_(zipmap (keys attr-nodes) 
                          (map #(.ownerDocument (first (second (first %)))) 
                                                 (vals attr-nodes)))
         reachable-attrs (reduce (fn [acc [url [node attr]]] 
@@ -229,7 +234,8 @@
                                     (assoc acc url (assoc node-attr node (conj attrs attr)))))
                                 {} 
                                 result)]
-    (into {} (for [[url node-attrs] reachable-attrs]
+    reachable-attrs
+    #_(into {} (for [[url node-attrs] reachable-attrs]
                [url (zipmap (map #(first (.select (url-root url) %)) (keys node-attrs))
                             (vals node-attrs))]))))
 
