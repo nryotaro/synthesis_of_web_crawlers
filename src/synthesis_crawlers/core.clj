@@ -11,7 +11,7 @@
 
 (defn element?
   [e]
-  #(instance? Element e))
+  (instance? Element e))
 
 (s/def ::attribute keyword?)
 (s/def ::attributes (s/coll-of ::attribute))
@@ -326,6 +326,9 @@
         :args (s/cat :node element?))
 (defn encode-node-path
   [node]
+  (println "node: " node)
+  (println "node: " (element? node))
+  (println "node: " "--")
   (reverse 
     (reduce (fn [acc node]
               (conj acc {:tag (.tagName node) :class (set (.classNames node)) :id (.id node)})) 
@@ -350,9 +353,7 @@
    (let [decoded (create-relative-path node)] 
      (if-not (seq prefix)
        decoded
-       (string/replace decoded (re-pattern (str prefix " > ")) "")
-       )
-     ))
+       (string/replace decoded (re-pattern (str prefix " > ")) ""))))
   ([node] (decode-node-path (encode-node-path node))))
 
 (s/fdef generate-container-cand-exprs
@@ -375,6 +376,8 @@
               :id (if (seq id) (->> id first second) "")
               :class (if (seq classes) (set (map second classes)) #{}))))
 
+(s/fdef parse-css-selector
+        :args (s/cat :selector string?))
 (defn parse-css-selector
   [selector]
   (map #(parse-css-clause %) 
