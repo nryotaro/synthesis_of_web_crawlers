@@ -224,20 +224,13 @@
                      selector (set (map #(.cssSelector %) 
                                     (flatten (map #(find-parents % (pages url)) selectors))))] 
                  [url [selector attr]])
-        ;url-root 
-        #_(zipmap (keys attr-nodes) 
-                         (map #(.ownerDocument (first (second (first %)))) 
-                                                (vals attr-nodes)))
         reachable-attrs (reduce (fn [acc [url [node attr]]] 
                                   (let [node-attr (get acc url {})
                                         attrs (get node-attr node #{})]
                                     (assoc acc url (assoc node-attr node (conj attrs attr)))))
                                 {} 
                                 result)]
-    reachable-attrs
-    #_(into {} (for [[url node-attrs] reachable-attrs]
-               [url (zipmap (map #(first (.select (url-root url) %)) (keys node-attrs))
-                            (vals node-attrs))]))))
+    reachable-attrs))
 
 
 ;; nested nodes aren't supported.
