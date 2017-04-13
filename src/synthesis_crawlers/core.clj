@@ -173,24 +173,17 @@
   [nodes knowledge]
   (reduce 
     (fn [nodes node]
-      (let [p (filter #(reach? % node) nodes)
+      (let [p (set (filter #(reach? % node) nodes))
             c (filter #(reach? node %) nodes)]
         (cond 
           ; nodes contain a node which is a parent of node
-          (seq p) (conj (remove p nodes p) node)
+          (seq p) (do 
+                    (conj (remove p nodes) node))
           ; node is a parent of one of nodes
           (seq c) nodes
           :else (conj nodes node))))
     [] 
     (filter #(not-empty (matched-knowledge (.text %) knowledge)) nodes)))
-
-#_(s/fdef find-nodes
-  :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
-#_(defn find-nodes
-  [pages attr-knowledge]
-  (for [[url text] pages
-        [attribute words] attr-knowledge]
-    nil))
 
 (s/fdef find-nodes-in-page
   :args (s/cat :pages ::pages :attr-knowledge ::attr-knowledge))
