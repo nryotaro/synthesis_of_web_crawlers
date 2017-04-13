@@ -312,11 +312,13 @@
                      (s/map-of string? (s/map-of element?
                                                  (s/coll-of keyword?)))
                      :url-attrs
-                     (s/map-of string? (s/coll-of keyword?))))
+                     (s/map-of string? (s/coll-of keyword?))
+                     :pages
+                     ::pages))
 (defn find-container
-  [reachable-attr-nodes url-attrs]
+  [reachable-attr-nodes url-attrs pages]
   (into {}
-        (map #(identity [% (find-container-node (reachable-attr-nodes %) (url-attrs %))]) 
+        (map #(identity [% (find-container-node (reachable-attr-nodes %) (url-attrs %) (pages %))]) 
              (keys url-attrs))))
 
 
