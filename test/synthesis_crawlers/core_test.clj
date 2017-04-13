@@ -215,12 +215,11 @@
 
 (deftest find-best-attr-set-test
   (testing "returns attributes found in pages"
-    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
-          inner-div (first (.select text "html > body > div > div")) 
-          html (first (.select text "html")) 
-          body (first (.select text "html > body")) 
-          span (first (.select text "html > body > div > span")) 
-          outer-div (first (.select text "html > body > div"))
+    (let [inner-div "html > body > div > div"
+          html "html"
+          body "html > body"
+          span "html > body > div > span"
+          outer-div "html > body > div"
           result (find-best-attr-set
                    {"http://foo.com" {:title [inner-div] :date [span] :body []}})]
       (is (= result
