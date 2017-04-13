@@ -16,6 +16,7 @@
 (s/def ::attribute keyword?)
 (s/def ::attributes (s/coll-of ::attribute))
 (s/def ::url-pattern #(instance? java.util.regex.Pattern %))
+(s/def ::selector string?)
 
 (s/def ::pages (s/map-of string? string?))
 (s/def ::sites (s/map-of string? (s/keys :req-un [::url-pattern ::pages])))
@@ -233,16 +234,20 @@
     reachable-attrs))
 
 
-;; nested nodes aren't supported.
+;; nested nodes aren't supported <- ?
 (s/fdef find-support-nodes
-        :args (s/cat :attr-nodes ::attributed-nodes-in-pages))
+        :args (s/cat :attr-nodes ::attributed-nodes-in-pages
+                     :pages ::pages))
 (defn find-support-nodes
-  [url-attr-nodes]
-  (let [result (for [[url attr-nodes] url-attr-nodes
-                     [attr nodes] attr-nodes
-                     node (set (map #(.cssSelector %) (flatten (map reachable-elements nodes))))]
-                 [url [node (map #(.cssSelector %) nodes)]])
-        url-root (zipmap (keys url-attr-nodes) 
+  [url-attr-selectors pages]
+  (let [result (for [[url attr-selectors] url-attr-selectors
+                     [attr selectors] attr-selectors
+                     selector (set (map #(.cssSelector %) 
+                                        (flatten 
+                                          (map #(find-parents % (pages url)) selectors))))]
+                 [url [selector selectors]])
+        ;url-root 
+        #_(zipmap (keys url-attr-nodes) 
                          (map #(.ownerDocument (first (second (first %)))) 
                                                 (vals url-attr-nodes)))
         support-nodes (reduce (fn [acc [url [node nodes]]] 
@@ -253,14 +258,15 @@
                                          (assoc node-nodes node (into node-set nodes)))))
                               {}
                               result)]
-    (into {}
+    support-nodes
+    #_(into {}
           (for [[url node-nodes] support-nodes]
             [url (zipmap (map #(first (.select (url-root url) %)) (keys node-nodes))
                          (for [nodes (vals node-nodes)](map #(first (.select (url-root url) %)) nodes)))]))))
 
 (s/fdef count-support-nodes
-       :args (s/cat :support-nodes (s/map-of string? (s/map-of #(instance? Element %)
-                                                               (s/coll-of #(instance? Element %))))))
+       :args (s/cat :support-nodes (s/map-of string? (s/map-of string?
+                                                               (s/coll-of string?)))))
 
 (defn count-support-nodes
   [support-nodes]
