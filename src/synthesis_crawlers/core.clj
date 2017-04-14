@@ -509,11 +509,13 @@
 (defn generate-extractors
   [pages attributed-knowledge threshold]
   (let [nodes-in-pages (find-nodes-in-page pages attributed-knowledge)
-        reachable-attrs (find-reachable-attrs nodes-in-pages)
-        support-nodes (count-support-nodes (find-support-nodes nodes-in-pages))
+        a (println "nodes-in-pages: " nodes-in-pages)
+        reachable-attrs (find-reachable-attrs nodes-in-pages pages)
+        support-nodes (count-support-nodes (find-support-nodes nodes-in-pages pages))
         container-cand-nodes (find-container reachable-attrs 
                                              (find-best-attr-set 
-                                               nodes-in-pages))
+                                               nodes-in-pages) 
+                                             pages)
         container-cand-exprs (generate-container-cand-exprs 
                                container-cand-nodes support-nodes)
         container-expr (unify-exprs 
