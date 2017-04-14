@@ -491,15 +491,16 @@
                :threshold double?))
 (defn generate-attr-exprs
   [container-descriptions nodes-in-pages pages threshold]
-  (into {} 
-        (for [attr (flatten (map keys (vals nodes-in-pages)))]
-          (let [nodes (map #(parse-css-selector 
-                              (do 
-                                (create-relative-path 
+  (let [attr-nodes (flatten-attributed-nodes nodes-in-pages pages)]
+    (into {} 
+          (for [attr (keys attr-nodes)]
+            (let [nodes (map #(parse-css-selector 
+                                (do 
+                                  (create-relative-path 
                                     (decode-node-path container-descriptions) %))) 
-                           (flatten (map #(vec (% attr)) (vals nodes-in-pages))))]
-            [attr (decode-node-path 
-                    (unify-exprs (zipmap nodes (repeat (count nodes) 1)) threshold))]))))
+                             (attr-nodes attr))]
+              [attr (decode-node-path 
+                      (unify-exprs (zipmap nodes (repeat (count nodes) 1)) threshold))])))))
 
 (s/fdef generate-extractors
         :args (s/cat :pages ::pages 
