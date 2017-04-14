@@ -99,7 +99,7 @@
              #{"span" "head"})))))
 
 
-#_(deftest find-attr-nodes-test
+(deftest find-attr-nodes-test
   (testing "returns the elements which contain text similar to the specified knowledge"
     (let [text (slurp "dev-resources/synthesis_crawlers/find_textnodes.html")]
       (is (= (map #(.text %)
@@ -232,10 +232,7 @@
           html "html"
           body "html > body"
           span "html > body > div > span"
-          outer-div "html > body > div"
-          ;result 
-          #_(find-best-attr-set
-                   {"http://foo.com" {:title [inner-div] :date [span] :body []}})]
+          outer-div "html > body > div"]
       (is (= (find-container-node 
                {inner-div #{:title}
                 outer-div #{:date :title}
@@ -388,7 +385,7 @@
                                   0.5) 
              {:title "div" :date "span"})))))
 
-#_(deftest generate-extractor-test
+(deftest generate-extractor-test
   (testing "generates extractors from the speicfied texts and words"
     (is (= (generate-extractors
              {"http://example.com/1" (slurp "dev-resources/synthesis_crawlers/generate-extractor/sample1.html")}
