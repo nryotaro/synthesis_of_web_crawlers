@@ -36,6 +36,8 @@
 
 (s/def ::url string?)
 (s/def ::selector string?)
+(s/def ::selectors (s/coll-of string?))
+
 (s/def ::reachable-attributes (s/map-of ::url (s/map-of ::selector ::attributes)))
 
 (s/def ::tag string?)
@@ -469,6 +471,18 @@
                        agreed 
                        (if inst (conj agreed-path inst) agreed-path))))))))))
 
+(s/fdef flatten-attributed-nodes
+        :args (s/cat :nodes-in-page (s/map-of ::url (s/map-of ::attribute ::selectors ))
+                     :pages ::pages))
+(defn flatten-attributed-nodes
+  [nodes-in-page pages]
+  (let [result (for [[url attr-selectors] nodes-in-page]
+                 (let [document (Jsoup/parse (pages url))]
+                   (zipmap (keys attr-selectors)
+                           (map #(set 
+                                   (map (fn [selector] (first (.select document selector))) %)) 
+                                (vals attr-selectors)))))]
+    (apply (partial merge-with into) result)))
 
 (s/fdef generate-attr-exprs
   :args (s/cat :container-descriptions (s/coll-of ::expr)

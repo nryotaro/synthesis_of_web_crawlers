@@ -360,13 +360,18 @@
              "html > body > div.foo")))))
 
 (deftest flatten-attributed-nodes-test
-    (testing "creates a attribute node map"
-
-      (is (= (flattern-attributed-nodes {"http://foo.com/1" {:title #{"html > body > div > span"}}
-                                         "http://foo.com/2" {:date #{"html > body > div"}}}
-                                        {"http://foo.com/1" "<html><body><div>hi</div></body></html>"
-                                         "http://foo.com/2" "<html><body><div><span>hello</span></div></body></html>"})
-             "to be implemented"))))
+  (testing "creates a attribute node map"
+    (let [div "html > body >div"
+         span "html > body > div > span"
+         text1 "<html><body><div>hi</div></body></html>"
+         text2 "<html><body><div><span>hello</span></div></body></html>"
+         result (flatten-attributed-nodes 
+                  {"http://foo.com/1" {:title #{div}}
+                   "http://foo.com/2" {:date #{span}}}
+                  {"http://foo.com/1" text1
+                   "http://foo.com/2" text2})]
+      (is (= (.toString (first (:title result))) "<div>\n hi\n</div>"))
+      (is (= (.toString (first (:date result))) "<span>hello</span>")))))
 
 (deftest generate-attr-exprs-test
   (testing "generates attribute descriptors"
