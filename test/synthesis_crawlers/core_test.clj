@@ -359,6 +359,15 @@
       (is (= (decode-node-path (unify-exprs {s1 1 s3 1} 0.6))
              "html > body > div.foo")))))
 
+(deftest flatten-attributed-nodes-test
+    (testing "creates a attribute node map"
+
+      (is (= (flattern-attributed-nodes {"http://foo.com/1" {:title #{"html > body > div > span"}}
+                                         "http://foo.com/2" {:date #{"html > body > div"}}}
+                                        {"http://foo.com/1" "<html><body><div>hi</div></body></html>"
+                                         "http://foo.com/2" "<html><body><div><span>hello</span></div></body></html>"})
+             "to be implemented"))))
+
 (deftest generate-attr-exprs-test
   (testing "generates attribute descriptors"
     (let [text (slurp "dev-resources/synthesis_crawlers/generate-attr-exprs.html")
@@ -370,6 +379,7 @@
           parsed (parse-css-selector "html > body > div")]
       (is (= (generate-attr-exprs parsed 
                                   {"http://foo.com" {:title #{inner-div} :date #{span}}} 
+                                  {"http://foo.com" text}
                                   0.5) 
              {:title "div" :date "span"})))))
 

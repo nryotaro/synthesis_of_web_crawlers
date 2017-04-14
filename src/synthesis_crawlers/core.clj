@@ -346,12 +346,16 @@
                    encoded-node)))
 
 
+(s/fdef create-relative-path
+        :args (s/alt :two (s/cat :prefix string? :node element?)
+                     :one (s/cat :node element?)))
 (defn create-relative-path
   ([prefix node] 
    (let [decoded (create-relative-path node)] 
      (if-not (seq prefix)
        decoded
        (string/replace decoded (re-pattern (str prefix " > ")) ""))))
+  ;; TODO
   ([node] (decode-node-path (encode-node-path node))))
 
 (s/fdef generate-container-cand-exprs
@@ -465,17 +469,20 @@
                        agreed 
                        (if inst (conj agreed-path inst) agreed-path))))))))))
 
+
 (s/fdef generate-attr-exprs
   :args (s/cat :container-descriptions (s/coll-of ::expr)
                :nodes-in-pages ::attributed-nodes-in-pages
+               :pages ::pages
                :threshold double?))
 (defn generate-attr-exprs
-  [container-descriptions nodes-in-pages threshold]
+  [container-descriptions nodes-in-pages pages threshold]
   (into {} 
         (for [attr (flatten (map keys (vals nodes-in-pages)))]
           (let [nodes (map #(parse-css-selector 
-                              (create-relative-path 
-                                (decode-node-path container-descriptions) %)) 
+                              (do 
+                                (create-relative-path 
+                                    (decode-node-path container-descriptions) %))) 
                            (flatten (map #(vec (% attr)) (vals nodes-in-pages))))]
             [attr (decode-node-path 
                     (unify-exprs (zipmap nodes (repeat (count nodes) 1)) threshold))]))))
