@@ -393,7 +393,7 @@
              {:food #{"bacon" "batter" "black beans"}
               :date #{"2016-10-02"}}
              0.5)
-           "to be implemented"))))
+           {"html > body > article > div" {:food "div", :date "span"}}))))
 
 #_(deftest a-test
     (testing ""
