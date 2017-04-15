@@ -129,8 +129,7 @@
                                                            :pages {"http://www.economist.com/blogs/1" "<html><body><div><span>All in the golden afternoon</span></div></body></html>"
                                                                                                                          "http://www.economist.com/blogs/2" ""
                                                                                                                          }}}
-                              {"http://www.economist.com" {"html > body > div" {:title "span"}}}
-                              {})
+                              {"http://www.economist.com" {"html > body > div" {:title "span"}}})
            {:title #{"All in the golden afternoon"}}))))
 
 (deftest find-nodes-in-page-test
