@@ -119,13 +119,14 @@
   (testing "returns uncrawled site extractors"
     (is (= (uncrawled-extractors {"site" {"container" {:attr "containee"}}
                                   "site2" {"container2" {:attr "containee2"}}}
-                                 {"site" {"container" {:attr "containee"}}})
+                                 {"site" [{"container" {:attr "containee"}}]})
            {"site2" {"container2" {:attr "containee2"}}}))))
 
 
 (deftest extract-knowledge-test
   (testing "extracts knwoledge from the specified site"
-    (is (= (extract-knowledge {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" :pages {"http://www.economist.com/blogs/1" "<html><body><div><span>All in the golden afternoon</span></div></body></html>"
+    (is (= (extract-knowledge {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" 
+                                                           :pages {"http://www.economist.com/blogs/1" "<html><body><div><span>All in the golden afternoon</span></div></body></html>"
                                                                                                                          "http://www.economist.com/blogs/2" ""
                                                                                                                          }}}
                               {"http://www.economist.com" {"html > body > div" {:title "span"}}}

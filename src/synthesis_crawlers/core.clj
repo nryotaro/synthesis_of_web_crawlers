@@ -46,6 +46,8 @@
 (s/def ::support double?)
 (s/def ::expr (s/keys :req-un [::tag ::class ::id]))
 
+(s/def ::crawled-extractors (s/map-of ::url (s/coll-of ::extractor)))
+
 (s/fdef similarity :args (s/cat :a string? :b string?))
 (defn similarity
   "returns true value iff the specified extractor is incomplete"
@@ -65,12 +67,19 @@
 
 (s/fdef uncrawled-extractors
         :args (s/cat :site-extractors ::site-extractor 
-                     :crawled-extractors ::site-extractor)
-        :ret ::site-extractor)
+                     :crawled-extractors ::crawled-extractors))
 (defn uncrawled-extractors
   "Returns uncrawled site extractors."
   [site-extractors crawled-extractors]
-  (first (diff site-extractors crawled-extractors)))
+  (into {}
+        (filter some? 
+                (map (fn [[site extractor]] 
+                       (cond
+                         (nil? (crawled-extractors site)) [site extractor]
+                         (not (some #(= extractor %) (crawled-extractors site))) [site extractor]
+                         :else nil)) 
+                     site-extractors)))
+  #_(first (diff site-extractors crawled-extractors)))
 
 (defn crawled?
   [extractor crawled-set]
@@ -540,12 +549,14 @@
          crawled-extractors {}]
     (let [new-knowledge (merge-with into 
                                     attr-knowledge 
-                                    (extract-knowledge sites s-extractors crawled-extractors))]
-      ;; new-knowledge ::attr-knowledge
-      (into 
-        {}
-        (for [[site container-extractor] (filter (fn [[site container-extractor]]
-                                                   (incomplete-extractors? container-extractor)) 
-                                                 s-extractors)]
-          (generate-extractors (:pages (sites site)) new-knowledge threshold))))))
+                                    (extract-knowledge sites s-extractors crawled-extractors))
+          updated-extractors (into 
+                               {}
+                               (for [[site container-extractor] (filter (fn [[site container-extractor]]
+                                                                          (incomplete-extractors? container-extractor)) 
+                                                                        s-extractors)]
+                                 [site (generate-extractors (:pages (sites site)) new-knowledge threshold)]))]
+      
+      )))
+; TODO check crawled to extractors
 
