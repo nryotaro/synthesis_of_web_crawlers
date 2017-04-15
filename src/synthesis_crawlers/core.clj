@@ -524,7 +524,6 @@
                          (zipmap (map parse-css-selector (keys container-cand-exprs)) 
                                  (vals container-cand-exprs))
                          threshold)
-        a (println "nodes-in-pages: " nodes-in-pages)
         attr-exprs (generate-attr-exprs container-expr nodes-in-pages pages threshold)]
     {(decode-node-path container-expr) attr-exprs}))
 
@@ -548,21 +547,5 @@
         (for [[site container-extractor] (filter (fn [[site container-extractor]]
                                                    (incomplete-extractors? container-extractor)) 
                                                  s-extractors)]
-          (let [nodes-in-pages (find-nodes-in-page (:pages (sites site)) new-knowledge)
-                reachable-attrs (find-reachable-attrs nodes-in-pages)
-                support-nodes (count-support-nodes (find-support-nodes nodes-in-pages))
-                container-cand-nodes (find-container reachable-attrs 
-                                                     (find-best-attr-set 
-                                                       nodes-in-pages))
-                container-cand-exprs (generate-container-cand-exprs 
-                                       container-cand-nodes support-nodes)
-                container-expr (unify-exprs 
-                                 (zipmap (map parse-css-selector (keys container-cand-exprs)) 
-                                         (vals container-cand-exprs))
-                                 threshold)
-                attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
-            [site {(decode-node-path container-expr) attr-exprs}]
-            ))
-        )
-      )))
+          (generate-extractors (:pages (sites site)) new-knowledge threshold))))))
 
