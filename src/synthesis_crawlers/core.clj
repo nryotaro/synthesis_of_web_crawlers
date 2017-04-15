@@ -518,14 +518,14 @@
                                              (find-best-attr-set 
                                                nodes-in-pages) 
                                              pages)
-        a (println "nodes-in-pages: " nodes-in-pages)
         container-cand-exprs (generate-container-cand-exprs 
-                               container-cand-nodes support-nodes)
+                               container-cand-nodes support-nodes pages)
         container-expr (unify-exprs 
                          (zipmap (map parse-css-selector (keys container-cand-exprs)) 
                                  (vals container-cand-exprs))
                          threshold)
-        attr-exprs (generate-attr-exprs container-expr nodes-in-pages threshold)]
+        a (println "nodes-in-pages: " nodes-in-pages)
+        attr-exprs (generate-attr-exprs container-expr nodes-in-pages pages threshold)]
     {(decode-node-path container-expr) attr-exprs}))
 
 (s/fdef synthesis
