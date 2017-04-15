@@ -361,14 +361,17 @@
   ([node] (decode-node-path (encode-node-path node))))
 
 (s/fdef generate-container-cand-exprs
-        :args (s/cat :container-cand-nodes (s/map-of string? (s/coll-of element?))
-                     :support-node-num (s/map-of string? (s/map-of element? pos-int?))))
+        :args (s/cat :container-cand-nodes (s/map-of ::url ::selectors)
+                     :support-node-num (s/map-of ::url (s/map-of ::selector pos-int?))
+                     :pages ::pages))
 (defn generate-container-cand-exprs
-  [container-cand-nodes support-node-num]
+  [container-cand-nodes support-node-num pages]
   (into {} 
         (for [[url container-cands] container-cand-nodes
+              document [(Jsoup/parse (pages url))]
               cand container-cands]
-          [(create-relative-path cand) ((support-node-num url) cand)])))
+          (do 
+            [(create-relative-path (first (.select document cand))) ((support-node-num url) cand)]))))
 
 (s/fdef parse-css-clause :args (s/cat :clause string?))
 (defn parse-css-clause
@@ -509,13 +512,13 @@
 (defn generate-extractors
   [pages attributed-knowledge threshold]
   (let [nodes-in-pages (find-nodes-in-page pages attributed-knowledge)
-        a (println "nodes-in-pages: " nodes-in-pages)
         reachable-attrs (find-reachable-attrs nodes-in-pages pages)
         support-nodes (count-support-nodes (find-support-nodes nodes-in-pages pages))
         container-cand-nodes (find-container reachable-attrs 
                                              (find-best-attr-set 
                                                nodes-in-pages) 
                                              pages)
+        a (println "nodes-in-pages: " nodes-in-pages)
         container-cand-exprs (generate-container-cand-exprs 
                                container-cand-nodes support-nodes)
         container-expr (unify-exprs 

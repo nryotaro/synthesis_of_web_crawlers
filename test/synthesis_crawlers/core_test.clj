@@ -281,19 +281,20 @@
 
 (deftest generate-container-cand-exprs-test
   (testing "generates the expressions of the specified containers"
-    (let [text (Jsoup/parse (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html"))
-          inner-div (first (.select text "html > body > div > div")) 
-          html (first (.select text "html")) 
-          body (first (.select text "html > body")) 
-          span (first (.select text "html > body > div > span")) 
-          outer-div (first (.select text "html > body > div"))]
+    (let [text (slurp "dev-resources/synthesis_crawlers/find-reachable-attrs.html")
+          inner-div "html > body > div > div"
+          html "html"
+          body "html > body"
+          span "html > body > div > span"
+          outer-div "html > body > div"]
       (is (= (generate-container-cand-exprs
                {"http://foo.com" #{outer-div}}
                {"http://foo.com" {inner-div 1
                                   outer-div 2
                                   html 2
                                   body 2
-                                  span 1}})
+                                  span 1}}
+               {"http://foo.com" text})
              {"html > body > div" 2})))))
 
 (deftest parse-css-selctor-test
