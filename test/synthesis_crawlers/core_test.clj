@@ -395,6 +395,17 @@
              0.5)
            {"html > body > article > div" {:food "div", :date "span"}}))))
 
+(deftest check-crawled-extractors-test
+  (testing "puts extractors in crawled-extractors and returns them"
+    (is (= (check-crawled-extractors
+             {"site" #{{"container" {:attr "containee"}}}
+              "site2" #{{"container2" {:attr "containee2"}}}}
+              {"site" {"container3" {:attr "containee3"}}}) 
+
+           {"site" #{{"container" {:attr "containee"}}
+                     {"container3" {:attr "containee3"}}}
+            "site2" #{{"container2" {:attr "containee2"}}}}))))
+
 #_(deftest a-test
     (testing ""
       (is (= nil 

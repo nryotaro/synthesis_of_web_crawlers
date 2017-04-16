@@ -533,6 +533,19 @@
         attr-exprs (generate-attr-exprs container-expr nodes-in-pages pages threshold)]
     {(decode-node-path container-expr) attr-exprs}))
 
+(s/fdef check-crawled-extractors
+  :args (s/cat :crawled-extractors ::crawled-extractors
+               :extractors ::site-extractor))
+(defn check-crawled-extractors
+  [crawled-extractors extractors]
+  (merge crawled-extractors
+         (into 
+           {}
+           (for [[site exts] extractors]
+             (cond
+               (crawled-extractors site) [site (conj (crawled-extractors site) exts)]
+               :else [site (set exts)])))))
+
 (s/fdef synthesis
         :args (s/cat :attributes 
                      ::attributes 
@@ -553,7 +566,10 @@
                                (for [[site _] (filter (fn [[site container-extractor]]
                                                         (incomplete-extractors? container-extractor)) 
                                                       s-extractors)]
-                                 [site (generate-extractors (:pages (sites site)) new-knowledge threshold)]))]
-      
-      )))
+                                 [site (generate-extractors (:pages (sites site)) new-knowledge threshold)]))
+          resulted-extractors (merge s-extractors updated-extractors)]
+      (if (not (= attr-knowledge new-knowledge) (= s-extractors resulted-extractors))
+        ; TODO define crawled-extractors
+        (recur new-knowledge resulted-extractors (check-crawled-extractors crawled-extractors extractors)) ;
+        resulted-extractors))))
 
