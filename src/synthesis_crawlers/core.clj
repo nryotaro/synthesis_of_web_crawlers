@@ -544,7 +544,7 @@
            (for [[site exts] extractors]
              (cond
                (crawled-extractors site) [site (conj (crawled-extractors site) exts)]
-               :else [site (set exts)])))))
+               :else [site (conj #{} exts)])))))
 
 (s/fdef synthesis
         :args (s/cat :attributes 
@@ -557,6 +557,8 @@
   (loop [attr-knowledge {}
          s-extractors site-extractors
          crawled-extractors {}]
+    (println "s-extractors: " s-extractors)
+    (println "crawled-extractors: " crawled-extractors)
     (let [extractors (uncrawled-extractors s-extractors crawled-extractors)
           new-knowledge (merge-with into 
                                     attr-knowledge 
@@ -568,8 +570,13 @@
                                                       s-extractors)]
                                  [site (generate-extractors (:pages (sites site)) new-knowledge threshold)]))
           resulted-extractors (merge s-extractors updated-extractors)]
-      (if (not (= attr-knowledge new-knowledge) (= s-extractors resulted-extractors))
-        ; TODO define crawled-extractors
-        (recur new-knowledge resulted-extractors (check-crawled-extractors crawled-extractors extractors)) ;
+      (if (not (and (= attr-knowledge new-knowledge) (= s-extractors resulted-extractors)))
+        (do
+          (println "recur:" (pr-str crawled-extractors))
+          (println "recur:" (pr-str extractors))
+          (println "recur:" (pr-str (check-crawled-extractors crawled-extractors extractors)))
+          (recur new-knowledge resulted-extractors (check-crawled-extractors crawled-extractors extractors))
+          )
+        
         resulted-extractors))))
 
