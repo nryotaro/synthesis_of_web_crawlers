@@ -33,7 +33,9 @@
     (is (= (build-selector :a "html" "body")
            {:a "html > body"}))
     (is (= (build-selector :a "" "body")
-           {:a "body"}))))
+           {:a "body"}))
+    (is (= (build-selector :title "html > body > div" "")
+           {:title "html > body > div"}))))
 
 (deftest build-selectors-test
   (testing "converts the specified extractors to the selector map"
@@ -276,7 +278,10 @@
   (testing "returns a css selector which specifies e"
     (let [node (first (.select (Jsoup/parse "<html><body><div class=\"hoge\"><span id=\"sp\"></span></div></html>") "html > body > div > span#sp"))]
       (is (= (create-relative-path node) "html > body > div.hoge > span#sp"))
-      (is (= (create-relative-path "html > body > div.hoge" node) "span#sp"))
+      (is (= (create-relative-path "html > body > div.hoge" node) "span#sp")))
+    (let [node (first (.select (Jsoup/parse "<html><body><div>hello world1</div></body></html>") "html > body > div"))]
+      (is (= (create-relative-path "html > body > div" node)
+             ""))
       )))
 
 (deftest generate-container-cand-exprs-test
@@ -384,7 +389,13 @@
                                   {"http://foo.com" {:title #{inner-div} :date #{span}}} 
                                   {"http://foo.com" text}
                                   0.5) 
-             {:title "div" :date "span"})))))
+             {:title "div" :date "span"})))
+    (is (= (generate-attr-exprs [{:id "", :class #{}, :tag "html"} {:id "", :class #{}, :tag "body"} {:id "", :class #{}, :tag "div"}]
+                                {"http://www.newsweek.com/1" {:title #{"html > body > div"}}}
+                                {"http://www.newsweek.com/1" "<html><body><div>hello world1</div></body></html>"}
+                                0.5)
+           {:title ""}))
+    ))
 
 (deftest generate-extractor-test
   (testing "generates extractors from the speicfied texts and words"
@@ -412,12 +423,7 @@
               "http://www.newsweek.com" #{{"" {:title nil}}}}
            ))))
 
-#_(deftest a-test
-    (testing ""
-      (is (= nil 
-             "to be implemented"))))
-
-#_(deftest synthesis-test
+(deftest synthesis-test
   (testing "tests synthesis"
     (is (= (synthesis #{:title} 
                       {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" 
@@ -427,4 +433,9 @@
                       {"http://www.economist.com" {"html > body" {:title "span"}}
                        "http://www.newsweek.com" {"" {:title nil}}}
                       0.5)
-           nil))))
+           {"http://www.economist.com" {"html > body" {:title "span"}}, "http://www.newsweek.com" {"html > body > div" {:title ""}}}))))
+
+#_(deftest a-test
+    (testing ""
+      (is (= nil 
+             "to be implemented"))))

@@ -85,10 +85,13 @@
   (crawled-set extractor))
 
 
+(s/fdef build-selector
+  :args (s/cat :attribute ::attribute :container-expr ::container-extractor :attr-expr string?))
 (defn build-selector [attribute container-expr attr-expr]
   {attribute 
    (cond
      (empty? container-expr) attr-expr
+     (empty? attr-expr) container-expr
      :else (str container-expr " > " attr-expr))})
 
 ;; If container is empty, it is interpreted as a node descriptor that extracts the root of the page. 
@@ -360,10 +363,11 @@
 (defn create-relative-path
   ([prefix node] 
    (let [decoded (create-relative-path node)] 
-     (if-not (seq prefix)
-       decoded
-       (string/replace decoded (re-pattern (str prefix " > ")) ""))))
-  ;; TODO
+     (cond 
+       (= prefix decoded) "" 
+       (seq prefix) (string/replace decoded (re-pattern (str prefix " > ")) "")
+       :else decoded
+       )))
   ([node] (decode-node-path (encode-node-path node))))
 
 (s/fdef generate-container-cand-exprs
@@ -504,9 +508,8 @@
     (into {} 
           (for [attr (keys attr-nodes)]
             (let [nodes (map #(parse-css-selector 
-                                (do 
                                   (create-relative-path 
-                                    (decode-node-path container-descriptions) %))) 
+                                    (decode-node-path container-descriptions) %))
                              (attr-nodes attr))]
               [attr (decode-node-path 
                       (unify-exprs (zipmap nodes (repeat (count nodes) 1)) threshold))])))))
@@ -557,8 +560,6 @@
   (loop [attr-knowledge {}
          s-extractors site-extractors
          crawled-extractors {}]
-    (println "s-extractors: " s-extractors)
-    (println "crawled-extractors: " crawled-extractors)
     (let [extractors (uncrawled-extractors s-extractors crawled-extractors)
           new-knowledge (merge-with into 
                                     attr-knowledge 
@@ -571,12 +572,6 @@
                                  [site (generate-extractors (:pages (sites site)) new-knowledge threshold)]))
           resulted-extractors (merge s-extractors updated-extractors)]
       (if (not (and (= attr-knowledge new-knowledge) (= s-extractors resulted-extractors)))
-        (do
-          (println "recur:" (pr-str crawled-extractors))
-          (println "recur:" (pr-str extractors))
-          (println "recur:" (pr-str (check-crawled-extractors crawled-extractors extractors)))
-          (recur new-knowledge resulted-extractors (check-crawled-extractors crawled-extractors extractors))
-          )
-        
+        (recur new-knowledge resulted-extractors (check-crawled-extractors crawled-extractors extractors))
         resulted-extractors))))
 
