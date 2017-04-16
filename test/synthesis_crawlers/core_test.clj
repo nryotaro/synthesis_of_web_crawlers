@@ -401,10 +401,16 @@
              {"site" #{{"container" {:attr "containee"}}}
               "site2" #{{"container2" {:attr "containee2"}}}}
               {"site" {"container3" {:attr "containee3"}}}) 
-
            {"site" #{{"container" {:attr "containee"}}
                      {"container3" {:attr "containee3"}}}
-            "site2" #{{"container2" {:attr "containee2"}}}}))))
+            "site2" #{{"container2" {:attr "containee2"}}}}))
+    (is (= (check-crawled-extractors
+             {}
+             {"http://www.economist.com" {"html > body" {:title "span"}} 
+              "http://www.newsweek.com" {"" {:title nil}}})
+             {"http://www.economist.com" #{{"html > body" {:title "span"}}} 
+              "http://www.newsweek.com" #{{"" {:title nil}}}}
+           ))))
 
 #_(deftest a-test
     (testing ""
