@@ -6,10 +6,13 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
 
     (synthesis attributes
                {website-url1 {:pages {page-url1 page-text1}}
-                website-url2 {:pages {page-url2 page-text2}}}
-               {website-url1 {container {attribute 
+                website-url2 {:pages {page-url2 page-text2}} ..}
+               {website-url1 {container-descriptor {attribute1 attribute-node-descriptor1
+                                                    attribute2 attribute-node-descriptor2 ..}}
+                website-url2 {"" {attribute1 nil
+                                  attribute2 nil}}}
                threshold)
-               
+### Example               
     (is (= (synthesis #{:title} 
                       {"http://www.foo.com" 
                        {:pages {"http://www.foo.com/blogs/1" "<html><body><span>hello world!</span></body></html>"}}
@@ -23,7 +26,9 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
 
 `#{:title}` are attributes, which define the types o
 
-Generating URL patterns is not supported. 
+URL pattern synthesis is not supported. 
+
+CSS
 
 ## License
 
