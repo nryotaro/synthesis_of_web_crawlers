@@ -13,10 +13,11 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
                                   attribute2 nil}}}
                threshold)
 
-- attributes defines the types of data to be extracted
-- website-url1 is the root url of website1
-- page-url1 is a url of website1
-- container-descriptor is a CSS Selector describing an item container. A container is a sub-tree that contains all the attribute values you would like to extract.
+- `attributes` defines the types of data to be extracted
+- `website-url1`: the root url of website1
+- `page-url1`: a url of website1
+- `container-descriptor` is a CSS selector describing an item container. A container is a sub-tree that contains all the attribute values you would like to extract.
+- `attribute1,2` is one of `attributes`
 
 ### Example               
     (is (= (synthesis #{:title} 
