@@ -1,9 +1,21 @@
 # synthesis-crawlers
 
 An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.org/citation.cfm?id=2884842)
+An automatic synthesis of data extracting web crawlers by extrapolating existing crawlers for the same category of data
+from other websites.
 
 ## Usage
 
+`synthesis` automatically synthesizes data extracting web
+presented an automatic synthesis of data extracting web crawlers
+by extrapolating existing crawlers for the same category of data
+from other websites.
+
+`synthesis` accepts 
+For a successful application of our algorithm, at least
+one extraction scheme should be provided for every attribute.
+
+    
     (synthesis attributes
                {website-url1 {:pages {page-url1 page-text1}}
                 website-url2 {:pages {page-url2 page-text2}} ..}
@@ -19,6 +31,7 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
 - `container-descriptor` is a CSS selector describing an item container. A container is a sub-tree that contains all the attribute values you would like to extract.
 - `attribute-node-descriptor1,2` are css selectors which are relative to the root of the container  
 - `attribute1` is one of `attributes`
+- `threshold`
 
 ### Example               
     (is (= (synthesis #{:title} 
