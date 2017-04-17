@@ -16,7 +16,7 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
 - attributes defines the types of data to be extracted
 - website-url1 is the root url of website1
 - page-url1 is a url of website1
-- container-descriptor is a CSS selector query
+- container-descriptor is a CSS Selector describing an item container. A container is a sub-tree that contains all the attribute values you would like to extract.
 
 ### Example               
     (is (= (synthesis #{:title} 
