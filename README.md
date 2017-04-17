@@ -14,6 +14,8 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
                       0.5)
            {"http://www.foo.com" {"html > body" {:title "span"}} 
             "http://www.bar.com" {"html > body > div" {:title ""}}}))
+ 
+Generating URL patterns is not supported. 
 
 ## License
 
