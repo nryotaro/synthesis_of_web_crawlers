@@ -12,6 +12,12 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
                 website-url2 {"" {attribute1 nil
                                   attribute2 nil}}}
                threshold)
+
+- attributes defines the types of data to be extracted
+- website-url1 is the root url of website1
+- page-url1 is a url of website1
+- container-descriptor is a CSS selector query
+
 ### Example               
     (is (= (synthesis #{:title} 
                       {"http://www.foo.com" 
