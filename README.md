@@ -17,7 +17,8 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
 - `website-url1`: the root url of website1
 - `page-url1`: a url of website1
 - `container-descriptor` is a CSS selector describing an item container. A container is a sub-tree that contains all the attribute values you would like to extract.
-- `attribute1,2` is one of `attributes`
+- `attribute-node-descriptor1,2` are css selectors which are relative to the root of the container  
+- `attribute1` is one of `attributes`
 
 ### Example               
     (is (= (synthesis #{:title} 
