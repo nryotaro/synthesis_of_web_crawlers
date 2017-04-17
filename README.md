@@ -1,6 +1,6 @@
 # synthesis-crawlers
 
-A Clojure library designed to ... well, that part is up to you.
+An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.org/citation.cfm?id=2884842)
 
 ## Usage
 
@@ -8,7 +8,7 @@ FIXME
 
 ## License
 
-Copyright © 2017 FIXME
+Copyright © 2017 Nakamura, Ryotaro
 
-Distributed under the Eclipse Public License either version 1.0 or (at
+Distributed under the MIT License either version 1.0 or (at
 your option) any later version.

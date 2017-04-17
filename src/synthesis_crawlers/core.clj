@@ -84,7 +84,6 @@
   [extractor crawled-set]
   (crawled-set extractor))
 
-
 (s/fdef build-selector
   :args (s/cat :attribute ::attribute :container-expr ::container-extractor :attr-expr string?))
 (defn build-selector [attribute container-expr attr-expr]
