@@ -19,7 +19,7 @@
 (s/def ::selector string?)
 
 (s/def ::pages (s/map-of string? string?))
-(s/def ::sites (s/map-of string? (s/keys :req-un [::url-pattern ::pages])))
+(s/def ::sites (s/map-of string? (s/keys :req-un [::pages])))
 (s/def ::knowledge (s/coll-of string?))
 (s/def ::attr-knowledge (s/map-of  ::attribute ::knowledge))
 (s/def ::attr-extractor (s/map-of keyword? (s/or :complete string? :empty nil?)))
