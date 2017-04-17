@@ -127,8 +127,7 @@
 
 (deftest extract-knowledge-test
   (testing "extracts knwoledge from the specified site"
-    (is (= (extract-knowledge {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" 
-                                                           :pages {"http://www.economist.com/blogs/1" "<html><body><div><span>All in the golden afternoon</span></div></body></html>"
+    (is (= (extract-knowledge {"http://www.economist.com" {:pages {"http://www.economist.com/blogs/1" "<html><body><div><span>All in the golden afternoon</span></div></body></html>"
                                                                                                                          "http://www.economist.com/blogs/2" ""
                                                                                                                          }}}
                               {"http://www.economist.com" {"html > body > div" {:title "span"}}})
@@ -426,14 +425,13 @@
 (deftest synthesis-test
   (testing "tests synthesis"
     (is (= (synthesis #{:title} 
-                      {"http://www.economist.com" {:url-pattern #"^http://www\.economist\.com/blogs/.+$" 
-                                                   :pages {"http://www.economist.com/blogs/1" "<html><body><span>hello world</span></body></html>"}}
-                       "http://www.newsweek.com" {:url-pattern #"^http://www\.newsweek\.com/.+$"
-                                                  :pages {"http://www.newsweek.com/1" "<html><body><div>hello world1</div></body></html>"}}}
-                      {"http://www.economist.com" {"html > body" {:title "span"}}
-                       "http://www.newsweek.com" {"" {:title nil}}}
+                      {"http://www.foo.com" {:pages {"http://www.economist.com/blogs/1" "<html><body><span>hello world!</span></body></html>"}}
+                       "http://www.bar.com" {:pages {"http://www.newsweek.com/1" "<html><body><div>hello world1</div></body></html>"}}}
+                      {"http://www.foo.com" {"html > body" {:title "span"}}
+                       "http://www.bar.com" {"" {:title nil}}}
                       0.5)
-           {"http://www.economist.com" {"html > body" {:title "span"}}, "http://www.newsweek.com" {"html > body > div" {:title ""}}}))))
+           {"http://www.foo.com" {"html > body" {:title "span"}}, 
+            "http://www.bar.com" {"html > body > div" {:title ""}}}))))
 
 #_(deftest a-test
     (testing ""
