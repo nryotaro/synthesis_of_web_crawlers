@@ -4,6 +4,12 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
 
 ## Usage
 
+    (synthesis attributes
+               {website-url1 {:pages {page-url1 page-text1}}
+                website-url2 {:pages {page-url2 page-text2}}}
+               {website-url1 {container {attribute 
+               threshold)
+               
     (is (= (synthesis #{:title} 
                       {"http://www.foo.com" 
                        {:pages {"http://www.foo.com/blogs/1" "<html><body><span>hello world!</span></body></html>"}}
@@ -14,7 +20,9 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
                       0.5)
            {"http://www.foo.com" {"html > body" {:title "span"}} 
             "http://www.bar.com" {"html > body > div" {:title ""}}}))
- 
+
+`#{:title}` are attributes, which define the types o
+
 Generating URL patterns is not supported. 
 
 ## License
