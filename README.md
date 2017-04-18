@@ -35,6 +35,8 @@ from other websites.
 - `attribute1` is one of `attributes`
 - `threshold`: Each attribute *a* is associated with an equivalence relation that determines if two values are equivalent or not as instances of *a*. By default the function uses Jaccard similarity function with a threshold of `threshold` as an equivalence indicator between values.
 
+the CSS selectors must be sequential(n1 > n2 > n3 ..), and only *.class* *#id* *element* are supported.
+
 ### Example               
     (is (= (synthesis #{:title} 
                       {"http://www.foo.com" 
@@ -47,11 +49,10 @@ from other websites.
            {"http://www.foo.com" {"html > body" {:title "span"}} 
             "http://www.bar.com" {"html > body > div" {:title ""}}}))
 
-`#{:title}` are attributes, which define the types o
+
 
 URL pattern synthesis is not supported. 
 
-CSS
 
 ## License
 
