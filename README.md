@@ -1,29 +1,31 @@
 # synthesis-crawlers
 
 An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.org/citation.cfm?id=2884842)
-An automatic synthesis of data extracting web crawlers by extrapolating existing crawlers for the same category of data
-from other websites.
 
 ## Usage
 
-`synthesis` automatically synthesizes data extracting web
+`synthesis` automatically synthesizes data extractors which are responsible for extracting data of interest from webpaegs.
+It extrapolates data extractors from given hand-crafted data extractors and web pages.
+
+<!-- 
 presented an automatic synthesis of data extracting web crawlers
 by extrapolating existing crawlers for the same category of data
 from other websites.
-
-`synthesis` accepts 
-For a successful application of our algorithm, at least
-one extraction scheme should be provided for every attribute.
-
+-->
+    (def hand-crafted-data-extractors 
+      {website-url1 {container-descriptor {attribute1 attribute-node-descriptor1
+                                           attribute2 attribute-node-descriptor2 ..}}})
+    (def incomplete-data-extractors
+      {website-url2 {"" {attribute1 nil
+                         attribute2 nil}}})
     
-    (synthesis attributes
-               {website-url1 {:pages {page-url1 page-text1}}
-                website-url2 {:pages {page-url2 page-text2}} ..}
-               {website-url1 {container-descriptor {attribute1 attribute-node-descriptor1
-                                                    attribute2 attribute-node-descriptor2 ..}}
-                website-url2 {"" {attribute1 nil
-                                  attribute2 nil}}}
-               threshold)
+    (synthesis 
+      attributes
+      {website-url1 {:pages {page-url1 page-text1}}
+       website-url2 {:pages {page-url2 page-text2}} ..}
+      (into hand-crafted-data-extractors 
+            incomplete-data-extractors)
+      threshold)
 
 - `attributes` defines the types of data to be extracted
 - `website-url1`: the root url of website1
@@ -32,6 +34,7 @@ one extraction scheme should be provided for every attribute.
 - `attribute-node-descriptor1,2` are css selectors which are relative to the root of the container  
 - `attribute1` is one of `attributes`
 - `threshold`
+
 
 ### Example               
     (is (= (synthesis #{:title} 
