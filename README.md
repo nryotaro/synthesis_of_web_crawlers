@@ -35,10 +35,6 @@ from other websites.
 - `attribute1` is one of `attributes`
 - `threshold`: Each attribute *a* is associated with an equivalence relation that determines if two values are equivalent or not as instances of *a*. By default the function uses Jaccard similarity function with a threshold of `threshold` as an equivalence indicator between values.
 
-use
-Jaccard similarity function [21], J(d1; d2), with a threshold of 0.5
-as an equivalence indicator between values d1 and d2:
-
 ### Example               
     (is (= (synthesis #{:title} 
                       {"http://www.foo.com" 
