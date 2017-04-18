@@ -35,7 +35,7 @@ from other websites.
 - `attribute1` is one of `attributes`
 - `threshold`: Each attribute *a* is associated with an equivalence relation that determines if two values are equivalent or not as instances of *a*. By default the function uses Jaccard similarity function with a threshold of `threshold` as an equivalence indicator between values.
 
-the CSS selectors must be sequential(n1 > n2 > n3 ..), and only *.class* *#id* *element* are supported.
+the CSS selectors must be sequential(n1 > n2 > n3 ..), and only *.class*, *#id*, and *element* are supported.
 
 ### Example               
     (is (= (synthesis #{:title} 
