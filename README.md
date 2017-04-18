@@ -4,7 +4,7 @@ An implementation of [Cross-Supervised Synthesis of Web-Crawlers](http://dl.acm.
 
 ## Usage
 
-`synthesis` automatically synthesizes data extractors which are responsible for extracting data of interest from webpaegs.
+`synthesis` automatically synthesizes data extractors which are responsible for extracting data of interest from webpaegs.  
 It extrapolates data extractors from given hand-crafted data extractors and web pages.
 
 <!-- 
@@ -33,8 +33,11 @@ from other websites.
 - `container-descriptor` is a CSS selector describing an item container. A container is a sub-tree that contains all the attribute values you would like to extract.
 - `attribute-node-descriptor1,2` are css selectors which are relative to the root of the container  
 - `attribute1` is one of `attributes`
-- `threshold`
+- `threshold`: Each attribute *a* is associated with an equivalence relation that determines if two values are equivalent or not as instances of *a*. By default the function uses Jaccard similarity function with a threshold of `threshold` as an equivalence indicator between values.
 
+use
+Jaccard similarity function [21], J(d1; d2), with a threshold of 0.5
+as an equivalence indicator between values d1 and d2:
 
 ### Example               
     (is (= (synthesis #{:title} 
