@@ -39,7 +39,7 @@ the CSS selectors must be sequential(n1 > n2 > n3 ..), and only *.class*, *#id*,
 
 ### Example
 
-The following example extrapolates The data extractor of `http://www.bar.com`.
+The following example extrapolates the data extractor of `http://www.bar.com`.
 
     (is (= (synthesis #{:title} 
                       {"http://www.foo.com" 
