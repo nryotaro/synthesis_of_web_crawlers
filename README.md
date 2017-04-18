@@ -52,8 +52,10 @@ The following example extrapolates the data extractor of `http://www.bar.com`.
            {"http://www.foo.com" {"html > body" {:title "span"}} 
             "http://www.bar.com" {"html > body > div" {:title ""}}}))
 
-URL pattern synthesis is not supported. 
 
+## TODO
+
+URL pattern synthesis is not supported. 
 
 ## License
 
