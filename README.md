@@ -37,7 +37,10 @@ from other websites.
 
 the CSS selectors must be sequential(n1 > n2 > n3 ..), and only *.class*, *#id*, and *element* are supported.
 
-### Example               
+### Example
+
+The following example extrapolates The data extractor of `http://www.bar.com`.
+
     (is (= (synthesis #{:title} 
                       {"http://www.foo.com" 
                        {:pages {"http://www.foo.com/blogs/1" "<html><body><span>hello world!</span></body></html>"}}
@@ -48,8 +51,6 @@ the CSS selectors must be sequential(n1 > n2 > n3 ..), and only *.class*, *#id*,
                       0.5)
            {"http://www.foo.com" {"html > body" {:title "span"}} 
             "http://www.bar.com" {"html > body > div" {:title ""}}}))
-
-
 
 URL pattern synthesis is not supported. 
 
